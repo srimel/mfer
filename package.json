@@ -1,0 +1,19 @@
+{
+  "name": "run-mfs",
+  "version": "0.0.0-alpha.1",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "start": "node --loader ts-node/esm --no-warnings ./src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^24.0.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
