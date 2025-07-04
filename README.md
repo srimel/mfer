@@ -1,3 +1,3 @@
-# Run Micro Frontends
+# Micro Frontend Runner (mfer)
 
-Coming soon...
+A CLI tool that helps manage and run multiple micro frontends.

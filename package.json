@@ -1,19 +1,54 @@
 {
-  "name": "run-mfs",
-  "version": "0.0.0-alpha.1",
-  "description": "",
+  "name": "mfer",
+  "version": "0.0.0-alpha.2",
+  "description": "CLI tool designed to sensibly run micro-frontends from the terminal.",
+  "bin": {
+    "mfer": "dist/index.js"
+  },
   "main": "index.ts",
   "scripts": {
-    "start": "node --loader ts-node/esm --no-warnings ./src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "watch": "tsc --watch"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "micro frontends",
+    "micro frontend",
+    "microfrontend",
+    "micro-frontend",
+    "micro-frontends",
+    "mfe",
+    "CLI",
+    "runner"
+  ],
+  "author": "Stuart Rimel",
+  "license": "MIT",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/srimel/run-mfs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/srimel/run-mfs/issues"
+  },
+  "homepage": "https://github.com/srimel/run-mfs#readme",
+  "engines": {
+    "node": ">=18"
+  },
   "devDependencies": {
     "@types/node": "^24.0.3",
-    "ts-node": "^10.9.2",
+    "rimraf": "^6.0.1",
     "typescript": "^5.8.3"
-  }
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^7.5.3",
+    "chalk": "^5.4.1",
+    "commander": "^14.0.0",
+    "concurrently": "^9.2.0",
+    "yaml": "^2.8.0"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ]
 }
