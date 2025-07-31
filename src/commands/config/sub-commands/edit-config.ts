@@ -1,26 +1,26 @@
 import { Command } from "commander";
-import YAML from "yaml";
-import {
-  configExists,
-  currentConfig,
-  editConfigAsync,
-  MferConfig,
-  saveConfig,
-  warnOfMissingConfig,
-} from "../../../utils/config-utils.js";
+import { configExists, configPath, warnOfMissingConfig } from "../../../utils/config-utils.js";
+import chalk from "chalk";
+import { spawn } from "child_process";
+import * as os from "os";
 
 export const editConfigCommand = new Command("edit")
-  .description("edit configuration")
-  .action(async () => {
-    if (configExists) {
-      const answer = await editConfigAsync(
-        "edit configuration file, this will overwrite your existing configuration",
-        currentConfig
-      );
-
-      const newConfig: MferConfig = YAML.parse(answer);
-      saveConfig(newConfig);
-    } else {
+  .description("edit configuration in your preferred editor")
+  .action(() => {
+    if (!configExists) {
       warnOfMissingConfig();
+      return;
     }
+
+    // Determine the editor
+    const editor = process.env.EDITOR || process.env.VISUAL || (os.platform() === "win32" ? "notepad" : "vi");
+    console.log(chalk.green(`Opening config file in editor: ${editor}\n`));
+
+    spawn(editor, [configPath], {
+      stdio: "ignore",
+      detached: true,
+      shell: true
+    }).unref();
+
+    process.exit(0);
   });
