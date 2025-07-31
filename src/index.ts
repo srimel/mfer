@@ -4,6 +4,7 @@ import { program } from "commander";
 import configCommand from "./commands/config/index.js";
 import initCommand from "./commands/init.js";
 import runCommand from "./commands/run.js";
+import installCommand from "./commands/install.js";
 import { loadConfig } from "./utils/config-utils.js";
 
 // General
@@ -24,6 +25,7 @@ program
 program.addCommand(configCommand);
 program.addCommand(initCommand);
 program.addCommand(runCommand);
+program.addCommand(installCommand);
 
 // Configuration
 loadConfig();

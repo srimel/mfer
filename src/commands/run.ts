@@ -59,7 +59,7 @@ const runCommand = new Command("run")
     console.log(chalk.green(`Running micro frontends in group: ${groupName}...`));
     const concurrentlyResult = concurrently(commands, {
       prefix: "{name} |",
-      killOthers: ["failure", "success"],
+      killOthersOn: ["failure", "success"],
       restartTries: 0,
     });
 
