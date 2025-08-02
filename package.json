@@ -1,6 +1,6 @@
 {
   "name": "mfer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "CLI tool designed to sensibly run micro-frontends from the terminal.",
   "bin": {
     "mfer": "dist/index.js"
@@ -9,7 +9,9 @@
   "scripts": {
     "build": "tsc",
     "clean": "rimraf dist",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "keywords": [
     "micro frontends",
@@ -38,7 +40,8 @@
   "devDependencies": {
     "@types/node": "^24.0.3",
     "rimraf": "^6.0.1",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
   },
   "dependencies": {
     "@inquirer/prompts": "^7.5.3",

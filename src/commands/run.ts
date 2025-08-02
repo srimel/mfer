@@ -8,15 +8,6 @@ import concurrently from "concurrently";
 import chalk from "chalk";
 import path from "path";
 
-/* TODO - run command implementation
-
-Examples: 
-  - 'mfer run' runs all micro frontends in the configuration, same as 'mfer run all'
-  - 'mfer run [group_name]' runs all micro frontends in the specified group
-  - 'mfer run --select' prompts the user to de-select MFEs to run from specified group
-      - should also work with 'mfer run -s [group_name]'
-*/
-
 const runCommand = new Command("run")
   .description("run micro-frontend applications")
   .argument(
