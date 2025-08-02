@@ -5,6 +5,7 @@ import configCommand from "./commands/config/index.js";
 import initCommand from "./commands/init.js";
 import runCommand from "./commands/run.js";
 import installCommand from "./commands/install.js";
+import cloneCommand from "./commands/clone.js";
 import pullCommand from "./commands/pull.js";
 import { loadConfig } from "./utils/config-utils.js";
 
@@ -27,6 +28,7 @@ program.addCommand(configCommand);
 program.addCommand(initCommand);
 program.addCommand(runCommand);
 program.addCommand(installCommand);
+program.addCommand(cloneCommand);
 program.addCommand(pullCommand);
 
 // Configuration

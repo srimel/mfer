@@ -21,11 +21,14 @@ const templateConfig: MferConfig = {
 
 // Helper function to create and save configuration
 function createAndSaveConfig(githubUsername: string, mfeDirectory: string, allGroup: string[] = []): void {
+  // If no repositories are provided, create placeholder entries to show proper YAML syntax
+  const repositories = allGroup.length > 0 ? allGroup : ["my_mfe_1", "my_mfe_2"];
+  
   const newConfig: MferConfig = {
     base_github_url: `https://github.com/${githubUsername}`,
     mfe_directory: mfeDirectory,
     groups: {
-      all: allGroup,
+      all: repositories,
     },
   };
 
@@ -38,6 +41,11 @@ function createAndSaveConfig(githubUsername: string, mfeDirectory: string, allGr
   console.log(chalk.green(successMessage));
   console.log(chalk.blue(`Config file saved to: ${configPath}`));
   console.log(chalk.yellow("You can edit the config file later using: mfer config edit"));
+  
+  if (allGroup.length === 0) {
+    console.log(chalk.yellow("\nNote: Placeholder repository names have been added to show proper YAML syntax."));
+    console.log(chalk.yellow("Please replace 'my_mfe_1' and 'my_mfe_2' with your actual repository names."));
+  }
 }
 
 // Helper function to get folders from directory
