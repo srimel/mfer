@@ -15,7 +15,7 @@ program
   .description(
     "Micro Frontend Runner (mfer) - A CLI for running your project's micro frontends."
   )
-  .version("0.0.0-alpha.4", "-v, --version", "mfer CLI version")
+  .version("1.0.0", "-v, --version", "mfer CLI version")
   .hook("preAction", (thisCommand, actionCommand) => {
     console.log();
   })
