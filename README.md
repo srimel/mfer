@@ -1,5 +1,7 @@
 # mfer (Micro Frontend Runner)
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A powerful CLI tool designed to simplify the management and execution of multiple micro frontend applications. mfer helps developers run, update, and organize their micro frontend projects with minimal configuration and maximum efficiency.
 
 ## 🚀 Features
