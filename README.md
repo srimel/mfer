@@ -26,8 +26,8 @@ npm install -g mfer
 
 ### Install from source
 ```bash
-git clone https://github.com/srimel/run-mfs.git
-cd run-mfs
+git clone https://github.com/srimel/mfer.git
+cd mfer
 npm install
 npm run build
 npm install -g .
@@ -250,8 +250,8 @@ mfer config edit
 For local development of mfer itself:
 
 ```bash
-git clone https://github.com/srimel/run-mfs.git
-cd run-mfs
+git clone https://github.com/srimel/mfer.git
+cd mfer
 npm install
 npm run build
 npm install -g .
