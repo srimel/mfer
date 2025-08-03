@@ -8,6 +8,9 @@ import concurrently from "concurrently";
 import chalk from "chalk";
 import path from "path";
 
+// TODO: Make this configurable
+const RUN_COMMAND = "npm start";
+
 const runCommand = new Command("run")
   .description("run micro-frontend applications")
   .argument(
@@ -41,7 +44,7 @@ const runCommand = new Command("run")
     const mfeDir = currentConfig.mfe_directory;
     // List of colors to use for prefixes
     const commands = group.map((mfe) => ({
-      command: "npm start",
+      command: RUN_COMMAND,
       name: mfe,
       cwd: path.join(mfeDir, mfe),
       prefixColor: "blue"

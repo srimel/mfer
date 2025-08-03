@@ -10,15 +10,6 @@ A powerful CLI tool designed to simplify the management and execution of multipl
 - [📦 Installation](#-installation)
 - [🛠️ Quick Start](#️-quick-start)
 - [📋 Commands](#-commands)
-  - [mfer init](#mfer-init)
-  - [mfer run](#mfer-run)
-  - [mfer pull](#mfer-pull)
-  - [mfer install](#mfer-install)
-  - [mfer clone](#mfer-clone)
-  - [mfer config](#mfer-config)
-    - [mfer config list](#mfer-config-list)
-    - [mfer config edit](#mfer-config-edit)
-  - [mfer help](#mfer-help)
 - [⚙️ Configuration](#️-configuration)
 - [🎯 Use Cases](#-use-cases)
 - [🔧 Advanced Usage](#-advanced-usage)
@@ -92,6 +83,15 @@ mfer pull frontend
 ```
 
 ## 📋 Commands
+
+### Quick Reference
+- [`mfer init`](#mfer-init) - Interactive setup wizard
+- [`mfer run`](#mfer-run-group_name) - Run micro frontend applications
+- [`mfer pull`](#mfer-pull-group_name) - Pull latest changes from git repositories
+- [`mfer install`](#mfer-install-group_name) - Install dependencies for micro frontends
+- [`mfer clone`](#mfer-clone-group_name) - Clone repositories that don't exist locally
+- [`mfer config`](#mfer-config) - Manage configuration settings
+- [`mfer help`](#mfer-help) - Display help information
 
 ### `mfer init`
 Interactive setup wizard to create your configuration file.
@@ -265,7 +265,11 @@ groups:
 ## 🔧 Advanced Usage
 
 ### Custom Start Commands
-By default, mfer runs `npm start` in each project directory. You can customize this by modifying the run command in the source code.
+By default, mfer runs `npm start` in each project directory. 
+You can currently only customize this by modifying the run command in the source code.
+
+Adding configurable custom start commands is something I plan on adding in the near future. 
+I also welcome anyone to open a PR for that!
 
 ### Environment Variables
 mfer respects your existing environment setup and will use the same Node.js and npm versions you have configured.
