@@ -4,6 +4,29 @@
 
 A powerful CLI tool designed to simplify the management and execution of multiple micro frontend applications. mfer helps developers run, update, and organize their micro frontend projects with minimal configuration and maximum efficiency.
 
+## 📋 Table of Contents
+
+- [🚀 Features](#-features)
+- [📦 Installation](#-installation)
+- [🛠️ Quick Start](#️-quick-start)
+- [📋 Commands](#-commands)
+  - [mfer init](#mfer-init)
+  - [mfer run](#mfer-run)
+  - [mfer pull](#mfer-pull)
+  - [mfer install](#mfer-install)
+  - [mfer clone](#mfer-clone)
+  - [mfer config](#mfer-config)
+    - [mfer config list](#mfer-config-list)
+    - [mfer config edit](#mfer-config-edit)
+  - [mfer help](#mfer-help)
+- [⚙️ Configuration](#️-configuration)
+- [🎯 Use Cases](#-use-cases)
+- [🔧 Advanced Usage](#-advanced-usage)
+- [🐛 Troubleshooting](#-troubleshooting)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
+- [🙏 Acknowledgments](#-acknowledgments)
+
 ## 🚀 Features
 
 - **Concurrent Execution**: Run multiple micro frontends simultaneously with organized output
@@ -105,18 +128,52 @@ mfer pull         # Pull from all repositories
 mfer pull shared  # Pull from shared components group only
 ```
 
+### `mfer install [group_name]`
+Install dependencies for all micro frontends in a group.
+
+**Arguments:**
+- `group_name`: Name of the group to install dependencies for (defaults to "all")
+
+**Example:**
+```bash
+mfer install          # Install dependencies for all micro frontends
+mfer install frontend # Install dependencies for frontend group only
+```
+
+### `mfer clone [group_name]`
+Clone repositories that don't exist locally.
+
+**Arguments:**
+- `group_name`: Name of the group to clone repositories from (defaults to "all")
+
+**Example:**
+```bash
+mfer clone          # Clone all repositories
+mfer clone shared   # Clone repositories in shared group only
+```
+
 ### `mfer config`
 Manage your configuration settings.
 
 **Subcommands:**
-- `mfer config edit`: Open configuration file in your default editor
 - `mfer config list`: Display current configuration
+- `mfer config edit`: Open configuration file in your default editor
 
-### `mfer install`
-Install dependencies for all micro frontends in a group.
+**Example:**
+```bash
+mfer config list    # Show current configuration
+mfer config edit    # Edit configuration in your editor
+```
 
-### `mfer clone`
-Clone repositories that don't exist locally.
+### `mfer help`
+Display help information for mfer commands.
+
+**Example:**
+```bash
+mfer help           # Show general help
+mfer help run       # Show help for run command
+mfer help config    # Show help for config command
+```
 
 ## ⚙️ Configuration
 
@@ -256,6 +313,8 @@ npm install
 npm run build
 npm install -g .
 ```
+
+Refer to [local development](./docs/local-development.md) docs for more information.
 
 ## 🤝 Contributing
 
