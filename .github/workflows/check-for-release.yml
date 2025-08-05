@@ -1,0 +1,81 @@
+name: Check for Release
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - '.github/workflows/check-for-release.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch all history for tag comparison
+      
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22.x
+        
+    - name: Get current version
+      id: current-version
+      run: |
+        CURRENT_VERSION=$(node -p "require('./package.json').version")
+        echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+        echo "Current version: $CURRENT_VERSION"
+        
+    - name: Get previous version from latest tag
+      id: previous-version
+      run: |
+        # Get the latest tag that matches v*.*.* pattern
+        LATEST_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
+        
+        if [ -z "$LATEST_TAG" ]; then
+          echo "No previous version tag found, treating as first release"
+          echo "previous_version=none" >> $GITHUB_OUTPUT
+        else
+          # Remove 'v' prefix to get version number
+          PREV_VERSION=${LATEST_TAG#v}
+          echo "previous_version=$PREV_VERSION" >> $GITHUB_OUTPUT
+          echo "Previous version: $PREV_VERSION"
+        fi
+        
+    - name: Check if version changed
+      id: version-changed
+      run: |
+        CURRENT_VERSION="${{ steps.current-version.outputs.current-version }}"
+        PREV_VERSION="${{ steps.previous-version.outputs.previous-version }}"
+        
+        if [ "$PREV_VERSION" = "none" ] || [ "$CURRENT_VERSION" != "$PREV_VERSION" ]; then
+          echo "Version changed from $PREV_VERSION to $CURRENT_VERSION"
+          echo "version_changed=true" >> $GITHUB_OUTPUT
+        else
+          echo "Version unchanged: $CURRENT_VERSION"
+          echo "version_changed=false" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Create and push tag
+      if: steps.version-changed.outputs.version-changed == 'true'
+      run: |
+        CURRENT_VERSION="${{ steps.current-version.outputs.current-version }}"
+        TAG_NAME="v$CURRENT_VERSION"
+        
+        echo "Creating tag: $TAG_NAME"
+        
+        # Configure git
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        # Create and push the tag
+        git tag $TAG_NAME
+        git push origin $TAG_NAME
+        
+        echo "Tag $TAG_NAME created and pushed successfully" 

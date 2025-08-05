@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -40,3 +40,8 @@ jobs:
           LICENSE
         generate_release_notes: true
         make_latest: true
+
+    - name: Publish to NPM
+      run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
