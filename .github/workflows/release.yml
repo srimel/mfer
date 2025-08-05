@@ -1,12 +1,16 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release'
+        required: true
+        type: string
       
 permissions:
   contents: write
+  actions: read
 
 jobs:
   release:
@@ -33,6 +37,7 @@ jobs:
     - name: GH Release
       uses: softprops/action-gh-release@v2
       with:
+        tag_name: ${{ inputs.tag }}
         files: |
           dist/
           README.md
@@ -41,7 +46,10 @@ jobs:
         generate_release_notes: true
         make_latest: true
 
+    - name: Configure NPM
+      run: |
+        echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+        npm config set access public
+        
     - name: Publish to NPM
       run: npm publish
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
