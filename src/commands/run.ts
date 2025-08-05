@@ -7,8 +7,8 @@ import {
 import concurrently from "concurrently";
 import chalk from "chalk";
 import path from "path";
+import { checkbox } from "@inquirer/prompts";
 
-// TODO: Make this configurable
 const RUN_COMMAND = "npm start";
 
 const runCommand = new Command("run")
@@ -18,7 +18,8 @@ const runCommand = new Command("run")
     "name of the group as specified in the configuration",
     "all"
   )
-  .action((groupName) => {
+  .option("-s, --select", "prompt to select which micro frontends to run")
+  .action(async (groupName, options) => {
     if (!configExists) {
       warnOfMissingConfig();
       return;
@@ -41,23 +42,43 @@ const runCommand = new Command("run")
       return;
     }
 
+    let selectedMFEs = group;
+
+    // Prompt user to select MFEs if --select option is provided
+    if (options.select) {
+      try {
+        console.log(chalk.blue(`Select micro frontends to run from group '${groupName}':`));
+        selectedMFEs = await checkbox({
+          message: "Choose which micro frontends to run:",
+          choices: group.map(mfe => ({ name: mfe, value: mfe })),
+          validate: (arr) => arr.length > 0 ? true : "Select at least one micro frontend"
+        });
+      } catch (error) {
+        if (error instanceof Error && (error.message?.includes('SIGINT') || error.message?.includes('User force closed'))) {
+          console.log(chalk.yellow("\nReceived SIGINT. Stopping..."));
+          process.exit(130);
+        }
+        throw error;
+      }
+    }
+
     const mfeDir = currentConfig.mfe_directory;
-    // List of colors to use for prefixes
-    const commands = group.map((mfe) => ({
+    const commands = selectedMFEs.map((mfe) => ({
       command: RUN_COMMAND,
       name: mfe,
       cwd: path.join(mfeDir, mfe),
       prefixColor: "blue"
     }));
 
-    console.log(chalk.green(`Running micro frontends in group: ${groupName}...`));
+    const groupText = options.select ? `selected MFEs from group '${groupName}'` : `group '${groupName}'`;
+    console.log(chalk.green(`Running micro frontends in ${groupText}...`));
     const concurrentlyResult = concurrently(commands, {
       prefix: "{name} |",
       killOthersOn: ["failure", "success"],
       restartTries: 0,
     });
 
-    // Graceful shutdown on Ctrl+C
+    // Handle graceful shutdown on Ctrl+C
     const handleSigint = () => {
       console.log(chalk.yellow("\nReceived SIGINT. Stopping all micro frontends..."));
       concurrentlyResult.commands.forEach(cmd => {
