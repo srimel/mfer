@@ -1,6 +1,6 @@
 {
   "name": "mfer",
-  "version": "1.2.0",
+  "version": "1.4.0",
   "description": "CLI tool designed to sensibly run micro-frontends from the terminal.",
   "bin": {
     "mfer": "dist/index.js"
@@ -28,12 +28,12 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/srimel/run-mfs.git"
+    "url": "git+https://github.com/srimel/mfer.git"
   },
   "bugs": {
-    "url": "https://github.com/srimel/run-mfs/issues"
+    "url": "https://github.com/srimel/mfer/issues"
   },
-  "homepage": "https://github.com/srimel/run-mfs#readme",
+  "homepage": "https://github.com/srimel/mfer#readme",
   "engines": {
     "node": ">=18"
   },
