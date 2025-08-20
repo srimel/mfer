@@ -30,15 +30,18 @@ A powerful CLI tool designed to simplify the management and execution of multipl
 ## 📦 Installation
 
 ### Prerequisites
+
 - Node.js 18 or higher
 - Git (for repository management)
 
 ### Install from npm
+
 ```bash
 npm install -g mfer
 ```
 
 ### Install from source
+
 ```bash
 git clone https://github.com/srimel/mfer.git
 cd mfer
@@ -50,6 +53,7 @@ npm install -g .
 ## 🛠️ Quick Start
 
 ### 1. Initialize Configuration
+
 Start by setting up your mfer configuration:
 
 ```bash
@@ -57,11 +61,13 @@ mfer init
 ```
 
 This interactive wizard will guide you through:
+
 - Setting up your GitHub username
 - Specifying the directory containing your micro frontends
 - Selecting which projects to include in your default group
 
 ### 2. Run Your Micro Frontends
+
 ```bash
 # Run all micro frontends
 mfer run
@@ -74,6 +80,7 @@ mfer run shared
 ```
 
 ### 3. Update Your Repositories
+
 ```bash
 # Pull latest changes from all repositories
 mfer pull
@@ -85,6 +92,7 @@ mfer pull frontend
 ## 📋 Commands
 
 ### Quick Reference
+
 - [`mfer init`](#mfer-init) - Interactive setup wizard
 - [`mfer run`](#mfer-run-group_name) - Run micro frontend applications
 - [`mfer pull`](#mfer-pull-group_name) - Pull latest changes from git repositories
@@ -94,81 +102,101 @@ mfer pull frontend
 - [`mfer help`](#mfer-help) - Display help information
 
 ### `mfer init`
+
 Interactive setup wizard to create your configuration file.
 
 **Options:**
+
 - `-f, --force`: Force re-initialization even if config exists
 
 **Example:**
+
 ```bash
 mfer init --force
 ```
 
 ### `mfer run [group_name]`
+
 Run micro frontend applications concurrently.
 
 **Arguments:**
+
 - `group_name`: Name of the group to run (defaults to "all")
 
 **Example:**
+
 ```bash
 mfer run          # Run all micro frontends
 mfer run frontend # Run only frontend group
 ```
 
 ### `mfer pull [group_name]`
+
 Pull latest changes from git repositories.
 
 **Arguments:**
+
 - `group_name`: Name of the group to pull from (defaults to "all")
 
 **Example:**
+
 ```bash
 mfer pull         # Pull from all repositories
 mfer pull shared  # Pull from shared components group only
 ```
 
 ### `mfer install [group_name]`
+
 Install dependencies for all micro frontends in a group.
 
 **Arguments:**
+
 - `group_name`: Name of the group to install dependencies for (defaults to "all")
 
 **Example:**
+
 ```bash
 mfer install          # Install dependencies for all micro frontends
 mfer install frontend # Install dependencies for frontend group only
 ```
 
 ### `mfer clone [group_name]`
+
 Clone repositories that don't exist locally.
 
 **Arguments:**
+
 - `group_name`: Name of the group to clone repositories from (defaults to "all")
 
 **Example:**
+
 ```bash
 mfer clone          # Clone all repositories
 mfer clone shared   # Clone repositories in shared group only
 ```
 
 ### `mfer config`
+
 Manage your configuration settings.
 
 **Subcommands:**
+
 - `mfer config list`: Display current configuration
 - `mfer config edit`: Open configuration file in your default editor
 
 **Example:**
+
 ```bash
 mfer config list    # Show current configuration
 mfer config edit    # Edit configuration in your editor
 ```
 
 ### `mfer help`
+
 Display help information for mfer commands.
 
 **Example:**
+
 ```bash
 mfer help           # Show general help
 mfer help run       # Show help for run command
@@ -208,15 +236,17 @@ groups:
 You can edit your configuration in several ways:
 
 1. **Interactive editor** (recommended):
+
    ```bash
    mfer config edit
    ```
 
 2. **Direct file editing**:
+
    ```bash
    # On macOS/Linux
    nano ~/.mfer/config.yaml
-   
+
    # On Windows
    notepad %USERPROFILE%\.mfer\config.yaml
    ```
@@ -224,6 +254,7 @@ You can edit your configuration in several ways:
 ## 🎯 Use Cases
 
 ### Development Workflow
+
 ```bash
 # Start your day
 mfer pull          # Get latest changes
@@ -234,6 +265,7 @@ mfer run admin     # Start admin panel
 ```
 
 ### Project Organization
+
 Organize your micro frontends into logical groups:
 
 ```yaml
@@ -258,6 +290,7 @@ groups:
 ```
 
 ### Team Collaboration
+
 - Share configuration files with your team
 - Standardize development environment setup
 - Ensure everyone runs the same services
@@ -265,16 +298,19 @@ groups:
 ## 🔧 Advanced Usage
 
 ### Custom Start Commands
-By default, mfer runs `npm start` in each project directory. 
+
+By default, mfer runs `npm start` in each project directory.
 You can currently only customize this by modifying the run command in the source code.
 
-Adding configurable custom start commands is something I plan on adding in the near future. 
+Adding configurable custom start commands is something I plan on adding in the near future.
 I also welcome anyone to open a PR for that!
 
 ### Environment Variables
+
 mfer respects your existing environment setup and will use the same Node.js and npm versions you have configured.
 
 ### Process Management
+
 - All processes are managed concurrently with organized output
 - Use Ctrl+C to gracefully shut down all running services
 - Failed processes are reported with detailed error information
@@ -284,12 +320,14 @@ mfer respects your existing environment setup and will use the same Node.js and 
 ### Common Issues
 
 **"No configuration file detected"**
+
 ```bash
 # Run the initialization wizard
 mfer init
 ```
 
 **"Group not found"**
+
 ```bash
 # Check available groups
 mfer config list
@@ -299,15 +337,18 @@ mfer config edit
 ```
 
 **"Directory does not exist"**
+
 - Ensure the `mfe_directory` path in your configuration is correct
 - Use absolute paths for better reliability
 - Check that the directory exists and is accessible
 
 **"Not a git repository"**
+
 - Ensure all projects in your configuration are valid git repositories
 - Run `mfer clone` to clone missing repositories
 
 ### Development Mode
+
 For local development of mfer itself:
 
 ```bash
@@ -331,6 +372,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 Built with:
+
 - [Commander.js](https://github.com/tj/commander.js) - CLI framework
 - [Inquirer](https://github.com/SBoudrias/Inquirer.js) - Interactive prompts
 - [Concurrently](https://github.com/open-cli-tools/concurrently) - Process management

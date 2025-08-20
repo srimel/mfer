@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag to release'
+        description: "Tag to release"
         required: true
         type: string
-      
+
 permissions:
   contents: write
   actions: read
@@ -16,40 +16,40 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      
-    - name: Setup Node
-      uses: actions/setup-node@v4
-      with:
-        node-version: 22.x
-        cache: 'npm'
-        
-    - name: Install Dependencies
-      run: npm ci
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Build
-      run: npm run build
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: "npm"
 
-    - name: Run Unit Tests
-      run: npm test
+      - name: Install Dependencies
+        run: npm ci
 
-    - name: GH Release
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: ${{ inputs.tag }}
-        files: |
-          dist/
-          README.md
-          package.json
-          LICENSE
-        generate_release_notes: true
-        make_latest: true
+      - name: Build
+        run: npm run build
 
-    - name: Configure NPM
-      run: |
-        echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-        npm config set access public
-        
-    - name: Publish to NPM
-      run: npm publish
+      - name: Run Unit Tests
+        run: npm test
+
+      - name: GH Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag }}
+          files: |
+            dist/
+            README.md
+            package.json
+            LICENSE
+          generate_release_notes: true
+          make_latest: true
+
+      - name: Configure NPM
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          npm config set access public
+
+      - name: Publish to NPM
+        run: npm publish

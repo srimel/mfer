@@ -13,7 +13,7 @@ const installCommand = new Command("install")
   .argument(
     "[group_name]",
     "name of the group as specified in the configuration",
-    "all"
+    "all",
   )
   .action(async (groupName) => {
     if (!configExists) {
@@ -27,14 +27,16 @@ const installCommand = new Command("install")
       console.log(`${messagePrefix}: no group found with name '${groupName}'`);
       console.log(
         `Available groups: ${chalk.green(
-          Object.keys(currentConfig.groups).join(" ")
-        )}`
+          Object.keys(currentConfig.groups).join(" "),
+        )}`,
       );
       return;
     }
     if (!Array.isArray(group) || group.length === 0) {
       const messagePrefix = chalk.red("Error");
-      console.log(`${messagePrefix}: group '${groupName}' has no micro frontends defined.`);
+      console.log(
+        `${messagePrefix}: group '${groupName}' has no micro frontends defined.`,
+      );
       return;
     }
 
@@ -48,7 +50,7 @@ const installCommand = new Command("install")
       interrupted = true;
       console.log(chalk.yellow("\nReceived SIGINT. Stopping installs..."));
     };
-    process.once('SIGINT', handleSigint);
+    process.once("SIGINT", handleSigint);
 
     for (const mfe of group) {
       if (interrupted) break;
@@ -57,13 +59,19 @@ const installCommand = new Command("install")
       const result = spawnSync("npm", ["install"], {
         cwd,
         stdio: "inherit",
-        shell: true
+        shell: true,
       });
       if (result.status !== 0) {
         hadError = true;
-        console.error(chalk.red(`  MFE ${mfe} failed to install (cwd: ${cwd}) with exit code ${result.status}`));
+        console.error(
+          chalk.red(
+            `  MFE ${mfe} failed to install (cwd: ${cwd}) with exit code ${result.status}`,
+          ),
+        );
       } else {
-        console.log(chalk.green(`  MFE ${mfe} installed successfully (cwd: ${cwd})`));
+        console.log(
+          chalk.green(`  MFE ${mfe} installed successfully (cwd: ${cwd})`),
+        );
       }
     }
 

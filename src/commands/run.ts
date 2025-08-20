@@ -16,7 +16,7 @@ const runCommand = new Command("run")
   .argument(
     "[group_name]",
     "name of the group as specified in the configuration",
-    "all"
+    "all",
   )
   .option("-s, --select", "prompt to select which micro frontends to run")
   .action(async (groupName, options) => {
@@ -31,14 +31,16 @@ const runCommand = new Command("run")
       console.log(`${messagePrefix}: no group found with name '${groupName}'`);
       console.log(
         `Available groups: ${chalk.green(
-          Object.keys(currentConfig.groups).join(" ")
-        )}`
+          Object.keys(currentConfig.groups).join(" "),
+        )}`,
       );
       return;
     }
     if (!Array.isArray(group) || group.length === 0) {
       const messagePrefix = chalk.red("Error");
-      console.log(`${messagePrefix}: group '${groupName}' has no micro frontends defined.`);
+      console.log(
+        `${messagePrefix}: group '${groupName}' has no micro frontends defined.`,
+      );
       return;
     }
 
@@ -47,14 +49,23 @@ const runCommand = new Command("run")
     // Prompt user to select MFEs if --select option is provided
     if (options.select) {
       try {
-        console.log(chalk.blue(`Select micro frontends to run from group '${groupName}':`));
+        console.log(
+          chalk.blue(
+            `Select micro frontends to run from group '${groupName}':`,
+          ),
+        );
         selectedMFEs = await checkbox({
           message: "Choose which micro frontends to run:",
-          choices: group.map(mfe => ({ name: mfe, value: mfe })),
-          validate: (arr) => arr.length > 0 ? true : "Select at least one micro frontend"
+          choices: group.map((mfe) => ({ name: mfe, value: mfe })),
+          validate: (arr) =>
+            arr.length > 0 ? true : "Select at least one micro frontend",
         });
       } catch (error) {
-        if (error instanceof Error && (error.message?.includes('SIGINT') || error.message?.includes('User force closed'))) {
+        if (
+          error instanceof Error &&
+          (error.message?.includes("SIGINT") ||
+            error.message?.includes("User force closed"))
+        ) {
           console.log(chalk.yellow("\nReceived SIGINT. Stopping..."));
           process.exit(130);
         }
@@ -67,10 +78,12 @@ const runCommand = new Command("run")
       command: RUN_COMMAND,
       name: mfe,
       cwd: path.join(mfeDir, mfe),
-      prefixColor: "blue"
+      prefixColor: "blue",
     }));
 
-    const groupText = options.select ? `selected MFEs from group '${groupName}'` : `group '${groupName}'`;
+    const groupText = options.select
+      ? `selected MFEs from group '${groupName}'`
+      : `group '${groupName}'`;
     console.log(chalk.green(`Running micro frontends in ${groupText}...`));
     const concurrentlyResult = concurrently(commands, {
       prefix: "{name} |",
@@ -80,33 +93,39 @@ const runCommand = new Command("run")
 
     // Handle graceful shutdown on Ctrl+C
     const handleSigint = () => {
-      console.log(chalk.yellow("\nReceived SIGINT. Stopping all micro frontends..."));
-      concurrentlyResult.commands.forEach(cmd => {
-        if (cmd && typeof cmd.kill === 'function') {
+      console.log(
+        chalk.yellow("\nReceived SIGINT. Stopping all micro frontends..."),
+      );
+      concurrentlyResult.commands.forEach((cmd) => {
+        if (cmd && typeof cmd.kill === "function") {
           cmd.kill();
         }
       });
       process.exit(0);
     };
-    process.once('SIGINT', handleSigint);
+    process.once("SIGINT", handleSigint);
 
     concurrentlyResult.result.then(
       () => {},
-      (err: any) => {
-        console.error(chalk.red("One or more micro frontends failed to start."));
+      (err: unknown) => {
+        console.error(
+          chalk.red("One or more micro frontends failed to start."),
+        );
         if (Array.isArray(err)) {
           err.forEach((fail) => {
             const name = fail.command?.name || "unknown";
             const exitCode = fail.exitCode;
             const cwd = fail.command?.cwd || "unknown";
             console.error(
-              chalk.yellow(`  MFE ${name} failed to start (cwd: ${cwd}) with exit code ${exitCode}`)
+              chalk.yellow(
+                `  MFE ${name} failed to start (cwd: ${cwd}) with exit code ${exitCode}`,
+              ),
             );
           });
-        } else if (err && err.message) {
-          console.error(err.message);
+        } else if (err && typeof err === "object" && "message" in err) {
+          console.error((err as { message: string }).message);
         }
-      }
+      },
     );
   });
 

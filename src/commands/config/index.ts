@@ -10,7 +10,7 @@ Examples:
 */
 
 const configCommand = new Command("config").description(
-  "configuration settings"
+  "configuration settings",
 );
 
 configCommand.addCommand(listConfigCommand);

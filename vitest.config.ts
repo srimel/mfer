@@ -1,16 +1,19 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
+    coverage: {
+      reporter: ["text", "json", "html"],
+    },
     globals: true,
-    environment: 'node',
+    environment: "node",
     setupFiles: [],
-    include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
-    exclude: ['node_modules', 'dist', '.idea', '.git', '.cache'],
+    include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+    exclude: ["node_modules", "dist", ".idea", ".git", ".cache"],
   },
   resolve: {
     alias: {
-      '@': '/src',
+      "@": "/src",
     },
   },
-}); 
+});

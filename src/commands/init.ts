@@ -10,20 +10,16 @@ import chalk from "chalk";
 import * as fs from "fs";
 import { input, confirm, checkbox } from "@inquirer/prompts";
 
-const templateConfig: MferConfig = {
-  base_github_url: "https://github.com/your-username",
-  mfe_directory: "path/to/folder/containing/microfrontends",
-  groups: {
-    all: ["repo_name_1", "repo_name_2", "repo_name_3"],
-    customGroup1: ["repo_name2", "repo_name_3"],
-  },
-};
-
 // Helper function to create and save configuration
-function createAndSaveConfig(githubUsername: string, mfeDirectory: string, allGroup: string[] = []): void {
+function createAndSaveConfig(
+  githubUsername: string,
+  mfeDirectory: string,
+  allGroup: string[] = [],
+): void {
   // If no repositories are provided, create placeholder entries to show proper YAML syntax
-  const repositories = allGroup.length > 0 ? allGroup : ["my_mfe_1", "my_mfe_2"];
-  
+  const repositories =
+    allGroup.length > 0 ? allGroup : ["my_mfe_1", "my_mfe_2"];
+
   const newConfig: MferConfig = {
     base_github_url: `https://github.com/${githubUsername}`,
     mfe_directory: mfeDirectory,
@@ -33,35 +29,53 @@ function createAndSaveConfig(githubUsername: string, mfeDirectory: string, allGr
   };
 
   saveConfig(newConfig);
-  
-  const successMessage = allGroup.length > 0 
-    ? "Configuration created successfully!" 
-    : "Basic configuration created successfully!";
-  
+
+  const successMessage =
+    allGroup.length > 0
+      ? "Configuration created successfully!"
+      : "Basic configuration created successfully!";
+
   console.log(chalk.green(successMessage));
   console.log(chalk.blue(`Config file saved to: ${configPath}`));
-  console.log(chalk.yellow("You can edit the config file later using: mfer config edit"));
-  
+  console.log(
+    chalk.yellow("You can edit the config file later using: mfer config edit"),
+  );
+
   if (allGroup.length === 0) {
-    console.log(chalk.yellow("\nNote: Placeholder repository names have been added to show proper YAML syntax."));
-    console.log(chalk.yellow("Please replace 'my_mfe_1' and 'my_mfe_2' with your actual repository names."));
+    console.log(
+      chalk.yellow(
+        "\nNote: Placeholder repository names have been added to show proper YAML syntax.",
+      ),
+    );
+    console.log(
+      chalk.yellow(
+        "Please replace 'my_mfe_1' and 'my_mfe_2' with your actual repository names.",
+      ),
+    );
   }
 }
 
 // Helper function to get folders from directory
 function getFoldersFromDirectory(directoryPath: string): string[] {
   try {
-    if (fs.existsSync(directoryPath) && fs.statSync(directoryPath).isDirectory()) {
+    if (
+      fs.existsSync(directoryPath) &&
+      fs.statSync(directoryPath).isDirectory()
+    ) {
       const entries = fs.readdirSync(directoryPath, { withFileTypes: true });
-      return entries.filter(e => e.isDirectory()).map(e => e.name);
+      return entries.filter((e) => e.isDirectory()).map((e) => e.name);
     }
-  } catch (e) {
+  } catch {
+    // Silently handle errors when reading directory
   }
   return [];
 }
 
 // Helper function to prompt for GitHub information
-async function promptForGitHubInfo(): Promise<{ usesGithub: boolean; githubUsername?: string }> {
+async function promptForGitHubInfo(): Promise<{
+  usesGithub: boolean;
+  githubUsername?: string;
+}> {
   try {
     const usesGithub = await confirm({
       message: "Do you use GitHub to host your repositories?",
@@ -70,21 +84,22 @@ async function promptForGitHubInfo(): Promise<{ usesGithub: boolean; githubUsern
 
     if (!usesGithub) {
       console.log(
-        chalk.red("Currently, only GitHub is supported for repository hosting. Other providers are not yet supported.")
+        chalk.red(
+          "Currently, only GitHub is supported for repository hosting. Other providers are not yet supported.",
+        ),
       );
       return { usesGithub: false };
     }
 
     const githubUsername = await input({
       message: "What is your GitHub username?",
-      validate: (val) => val && val.trim() !== "" ? true : "Username cannot be empty"
+      validate: (val) =>
+        val && val.trim() !== "" ? true : "Username cannot be empty",
     });
 
     return { usesGithub: true, githubUsername };
   } catch (error) {
-    if (error instanceof Error && (error.message?.includes('SIGINT') || error.message?.includes('User force closed'))) {
-      throw error; 
-    }
+    // Re-throw the error to maintain the same behavior
     throw error;
   }
 }
@@ -96,14 +111,13 @@ async function promptForMFEDirectory(): Promise<string> {
       message: [
         "Enter the path to the folder containing all your micro frontends.",
         "  (Tip: Drag a folder from your file explorer into this terminal to paste its path)",
-        "  >>>"
+        "  >>>",
       ].join("\n"),
-      validate: (val) => val && val.trim() !== "" ? true : "Folder path cannot be empty"
+      validate: (val) =>
+        val && val.trim() !== "" ? true : "Folder path cannot be empty",
     });
   } catch (error) {
-    if (error instanceof Error && (error.message?.includes('SIGINT') || error.message?.includes('User force closed'))) {
-      throw error; 
-    }
+    // Re-throw the error to maintain the same behavior
     throw error;
   }
 }
@@ -113,41 +127,48 @@ async function promptForFolderSelection(folders: string[]): Promise<string[]> {
   try {
     return await checkbox({
       message: "Select which folders to include in the default 'all' group:",
-      choices: folders.map(f => ({ name: f, value: f })),
-      validate: (arr) => arr.length > 0 ? true : "Select at least one folder"
+      choices: folders.map((f) => ({ name: f, value: f })),
+      validate: (arr) => (arr.length > 0 ? true : "Select at least one folder"),
     });
   } catch (error) {
-    if (error instanceof Error && (error.message?.includes('SIGINT') || error.message?.includes('User force closed'))) {
-      throw error; 
-    }
+    // Re-throw the error to maintain the same behavior
     throw error;
   }
 }
 
 const initCommand = new Command("init")
   .description("setup a new configuration")
-  .option("-f, --force", "force re-initialization even if config exists and is valid")
+  .option(
+    "-f, --force",
+    "force re-initialization even if config exists and is valid",
+  )
   .action(async (options) => {
     let interrupted = false;
     const handleSigint = () => {
       interrupted = true;
-      console.log(chalk.yellow("\nReceived SIGINT. Stopping initialization..."));
-      process.exit(130); 
+      console.log(
+        chalk.yellow("\nReceived SIGINT. Stopping initialization..."),
+      );
+      process.exit(130);
     };
-    process.once('SIGINT', handleSigint);
+    process.once("SIGINT", handleSigint);
     if (configExists && isConfigValid() && !options.force) {
       const messagePrefix = chalk.red("Error");
       const mferCommandHint = chalk.blue("mfer config edit");
 
       console.log(
-        `${messagePrefix}: config already exists and is valid, you can edit it with ${mferCommandHint}`
+        `${messagePrefix}: config already exists and is valid, you can edit it with ${mferCommandHint}`,
       );
       console.log(chalk.yellow("Use --force to re-initialize anyway"));
       return;
     }
 
     if (configExists && !isConfigValid()) {
-      console.log(chalk.yellow("Existing config file is invalid or incomplete. Re-initializing..."));
+      console.log(
+        chalk.yellow(
+          "Existing config file is invalid or incomplete. Re-initializing...",
+        ),
+      );
     }
 
     if (configExists && isConfigValid() && options.force) {
@@ -169,7 +190,7 @@ const initCommand = new Command("init")
 
       // Try to get folders from directory
       const folders = getFoldersFromDirectory(mfeDirectory);
-      
+
       if (folders.length > 0) {
         // Prompt user to select which folders to include in 'all' group
         const selectedFolders = await promptForFolderSelection(folders);
@@ -179,15 +200,23 @@ const initCommand = new Command("init")
         createAndSaveConfig(githubUsername, mfeDirectory, selectedFolders);
       } else {
         // No folders found, create basic config
-        console.log("Add the names of your micro frontends to the 'groups' section.");
+        console.log(
+          "Add the names of your micro frontends to the 'groups' section.",
+        );
         createAndSaveConfig(githubUsername, mfeDirectory);
       }
     } catch (error) {
-      if (error instanceof Error && (error.message?.includes('SIGINT') || error.message?.includes('User force closed'))) {
-        console.log(chalk.yellow("\nReceived SIGINT. Stopping initialization..."));
-        process.exit(130); 
+      if (
+        error instanceof Error &&
+        (error.message?.includes("SIGINT") ||
+          error.message?.includes("User force closed"))
+      ) {
+        console.log(
+          chalk.yellow("\nReceived SIGINT. Stopping initialization..."),
+        );
+        process.exit(130);
       }
-      throw error; 
+      throw error;
     }
   });
 

@@ -13,13 +13,13 @@ import { loadConfig } from "./utils/config-utils.js";
 program
   .name("mfer")
   .description(
-    "Micro Frontend Runner (mfer) - A CLI for running your project's micro frontends."
+    "Micro Frontend Runner (mfer) - A CLI for running your project's micro frontends.",
   )
-  .version("1.4.1", "-v, --version", "mfer CLI version")
-  .hook("preAction", (thisCommand, actionCommand) => {
+  .version("1.4.2", "-v, --version", "mfer CLI version")
+  .hook("preAction", () => {
     console.log();
   })
-  .hook("postAction", (thisCommand, actionCommand) => {
+  .hook("postAction", () => {
     console.log();
   });
 
