@@ -123,11 +123,22 @@ Run micro frontend applications concurrently.
 
 - `group_name`: Name of the group to run (defaults to "all")
 
-**Example:**
+**Options:**
+
+- `-c, --command <command>`: Custom command to run (default: npm start)
+- `-a, --async`: Run custom command concurrently instead of sequentially
+- `-s, --select`: Prompt to select which micro frontends to run
+
+**Examples:**
 
 ```bash
-mfer run          # Run all micro frontends
-mfer run frontend # Run only frontend group
+mfer run                    # Run all micro frontends with default command (npm start)
+mfer run frontend          # Run only frontend group with default command
+mfer run --command "npm ci" home    # Run custom command sequentially on home group
+mfer run -c "yarn install" shared  # Run yarn install sequentially on shared group
+mfer run --command "npm ci" --async home  # Run custom command concurrently on home group
+mfer run -c "yarn install" -a shared  # Run yarn install concurrently on shared group
+mfer run --command "npm run build" --select  # Select MFEs and run build command sequentially
 ```
 
 ### `mfer pull [group_name]`

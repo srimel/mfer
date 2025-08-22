@@ -13,9 +13,9 @@ import { loadConfig } from "./utils/config-utils.js";
 program
   .name("mfer")
   .description(
-    "Micro Frontend Runner (mfer) - A CLI for running your project's micro frontends.",
+    "Micro Frontend Runner (mfer) - A CLI for running your project's micro frontends."
   )
-  .version("1.4.2", "-v, --version", "mfer CLI version")
+  .version("1.5.0", "-v, --version", "mfer CLI version")
   .hook("preAction", () => {
     console.log();
   })
