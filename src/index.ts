@@ -7,6 +7,7 @@ import runCommand from "./commands/run.js";
 import installCommand from "./commands/install.js";
 import cloneCommand from "./commands/clone.js";
 import pullCommand from "./commands/pull.js";
+import libCommand from "./commands/lib/index.js";
 import { loadConfig } from "./utils/config-utils.js";
 
 // General
@@ -30,6 +31,7 @@ program.addCommand(runCommand);
 program.addCommand(installCommand);
 program.addCommand(cloneCommand);
 program.addCommand(pullCommand);
+program.addCommand(libCommand);
 
 // Configuration
 loadConfig();
