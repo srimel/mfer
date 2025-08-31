@@ -65,7 +65,7 @@ function createAndSaveConfig(
   if (libDirectory && libs.length > 0) {
     console.log(
       chalk.green(
-        `\nLibrary configuration added: ${libs.length} librar${libs.length === 1 ? 'y' : 'ies'} configured.`,
+        `\nLibrary configuration added: ${libs.length} librar${libs.length === 1 ? "y" : "ies"} configured.`,
       ),
     );
     console.log(
@@ -161,7 +161,8 @@ async function promptForFolderSelection(folders: string[]): Promise<string[]> {
 async function promptForLibDirectory(): Promise<string | undefined> {
   try {
     const useLibs = await confirm({
-      message: "Do you have internal npm packages/libraries that need to be built and deployed to your micro frontends?",
+      message:
+        "Do you have internal npm packages/libraries that need to be built and deployed to your micro frontends?",
       default: false,
     });
 
@@ -190,7 +191,8 @@ async function promptForLibSelection(libs: string[]): Promise<string[]> {
     return await checkbox({
       message: "Select which libraries to include in the configuration:",
       choices: libs.map((lib) => ({ name: lib, value: lib })),
-      validate: (arr) => (arr.length > 0 ? true : "Select at least one library"),
+      validate: (arr) =>
+        arr.length > 0 ? true : "Select at least one library",
     });
   } catch (error) {
     // Re-throw the error to maintain the same behavior
@@ -275,17 +277,27 @@ const initCommand = new Command("init")
               return;
             }
           } else {
-            console.log(chalk.yellow("No library directories found in the specified path."));
+            console.log(
+              chalk.yellow(
+                "No library directories found in the specified path.",
+              ),
+            );
           }
         }
 
-        createAndSaveConfig(githubUsername, mfeDirectory, selectedFolders, libDirectory, libs);
+        createAndSaveConfig(
+          githubUsername,
+          mfeDirectory,
+          selectedFolders,
+          libDirectory,
+          libs,
+        );
       } else {
         // No folders found, create basic config
         console.log(
           "Add the names of your micro frontends to the 'groups' section.",
         );
-        
+
         // Prompt for library configuration even when no MFE folders found
         const libDirectory = await promptForLibDirectory();
         if (interrupted) {
@@ -301,11 +313,21 @@ const initCommand = new Command("init")
               return;
             }
           } else {
-            console.log(chalk.yellow("No library directories found in the specified path."));
+            console.log(
+              chalk.yellow(
+                "No library directories found in the specified path.",
+              ),
+            );
           }
         }
 
-        createAndSaveConfig(githubUsername, mfeDirectory, [], libDirectory, libs);
+        createAndSaveConfig(
+          githubUsername,
+          mfeDirectory,
+          [],
+          libDirectory,
+          libs,
+        );
       }
     } catch (error) {
       if (

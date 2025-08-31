@@ -68,7 +68,7 @@ describe("run command", () => {
         prefix: "{name} |",
         killOthersOn: ["failure", "success"],
         restartTries: 0,
-      })
+      }),
     );
   });
 
@@ -126,7 +126,7 @@ describe("run command", () => {
         prefix: "{name} |",
         killOthersOn: ["failure", "success"],
         restartTries: 0,
-      })
+      }),
     );
   });
 
@@ -152,7 +152,7 @@ describe("run command", () => {
         prefix: "{name} |",
         killOthersOn: ["failure", "success"],
         restartTries: 0,
-      })
+      }),
     );
   });
 
@@ -184,7 +184,7 @@ describe("run command", () => {
         stdio: "inherit",
         cwd: expect.stringMatching(/[\\\/]test[\\\/]mfe[\\\/]mfe\d+/),
         shell: true,
-      }
+      },
     );
   });
 
@@ -192,7 +192,7 @@ describe("run command", () => {
     await runCommand.parseAsync(["run", "home", "--command", "npm ci"]);
 
     expect(mockConsoleLog).toHaveBeenCalledWith(
-      expect.stringContaining("sequentially...")
+      expect.stringContaining("sequentially..."),
     );
   });
 
@@ -206,7 +206,7 @@ describe("run command", () => {
     ]);
 
     expect(mockConsoleLog).toHaveBeenCalledWith(
-      expect.stringContaining("concurrently...")
+      expect.stringContaining("concurrently..."),
     );
   });
 
@@ -214,7 +214,7 @@ describe("run command", () => {
     await runCommand.parseAsync(["run", "home", "--command", "   "]);
 
     expect(mockConsoleLog).toHaveBeenCalledWith(
-      expect.stringContaining("Error: custom command cannot be empty")
+      expect.stringContaining("Error: custom command cannot be empty"),
     );
   });
 
@@ -223,8 +223,8 @@ describe("run command", () => {
 
     expect(mockConsoleLog).toHaveBeenCalledWith(
       expect.stringContaining(
-        "Error: --async can only be used with --command option"
-      )
+        "Error: --async can only be used with --command option",
+      ),
     );
   });
 });

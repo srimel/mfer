@@ -2,7 +2,6 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![npm version](https://img.shields.io/npm/v/mfer.svg)](https://www.npmjs.com/package/mfer)
 
-
 A powerful CLI tool designed to simplify the management and execution of multiple micro frontend applications. mfer helps developers run, update, and organize their micro frontend projects with minimal configuration and maximum efficiency.
 
 ## 📋 Table of Contents
@@ -99,6 +98,7 @@ mfer pull frontend
 - [`mfer pull`](#mfer-pull-group_name) - Pull latest changes from git repositories
 - [`mfer install`](#mfer-install-group_name) - Install dependencies for micro frontends
 - [`mfer clone`](#mfer-clone-group_name) - Clone repositories that don't exist locally
+- [`mfer lib`](#mfer-lib) - Manage internal npm packages
 - [`mfer config`](#mfer-config) - Manage configuration settings
 - [`mfer help`](#mfer-help) - Display help information
 
@@ -215,6 +215,87 @@ mfer help run       # Show help for run command
 mfer help config    # Show help for config command
 ```
 
+### `mfer lib`
+
+Manage internal npm packages and their distribution to micro frontends.
+
+**Subcommands:**
+
+- [`mfer lib build`](#mfer-lib-build-lib-name) - Build internal npm packages
+- [`mfer lib deploy`](#mfer-lib-deploy-lib-name) - Copy built libraries to micro frontends
+- [`mfer lib publish`](#mfer-lib-publish-lib-name) - Build and deploy libraries to micro frontends
+- [`mfer lib list`](#mfer-lib-list) - List configured libraries and their status
+
+### `mfer lib build [lib-name]`
+
+Build internal npm packages.
+
+**Arguments:**
+
+- `lib-name`: Name of the library to build (builds all if not specified)
+
+**Options:**
+
+- `-s, --select`: Prompt to select which libraries to build
+
+**Examples:**
+
+```bash
+mfer lib build                    # Build all libraries
+mfer lib build my-shared-utils    # Build specific library
+mfer lib build --select           # Select libraries to build interactively
+```
+
+### `mfer lib deploy [lib-name]`
+
+Copy built libraries to micro frontends.
+
+**Arguments:**
+
+- `lib-name`: Name of the library to deploy (deploys all if not specified)
+
+**Options:**
+
+- `-s, --select`: Prompt to select which libraries to deploy
+
+**Examples:**
+
+```bash
+mfer lib deploy                    # Deploy all libraries
+mfer lib deploy my-shared-utils    # Deploy specific library
+mfer lib deploy --select           # Select libraries to deploy interactively
+```
+
+### `mfer lib publish [lib-name]`
+
+Build and deploy libraries to micro frontends.
+
+**Arguments:**
+
+- `lib-name`: Name of the library to publish (publishes all if not specified)
+
+**Options:**
+
+- `-s, --select`: Prompt to select which libraries to publish
+
+**Examples:**
+
+```bash
+mfer lib publish                    # Publish all libraries
+mfer lib publish my-shared-utils    # Publish specific library
+mfer lib publish --select           # Select libraries to publish interactively
+```
+
+### `mfer lib list`
+
+List configured libraries and their status.
+
+**Example:**
+
+```bash
+mfer lib list    # Show all configured libraries and their build status
+```
+
 ## ⚙️ Configuration
 
 mfer uses a YAML configuration file located at `~/.mfer/config.yaml`. Here's an example structure:
@@ -222,6 +303,11 @@ mfer uses a YAML configuration file located at `~/.mfer/config.yaml`. Here's an 
 ```yaml
 base_github_url: "https://github.com/your-username"
 mfe_directory: "/path/to/your/micro-frontends"
+lib_directory: "/path/to/your/internal-libs"
+libs:
+  - my-shared-utils
+  - my-design-system
+  - my-common-components
 groups:
   all:
     - my-main-app
@@ -239,6 +325,8 @@ groups:
 
 - **`base_github_url`**: Your GitHub base URL for repository operations
 - **`mfe_directory`**: Path to the directory containing all your micro frontend projects
+- **`lib_directory`**: Path to the directory containing your internal npm packages (optional)
+- **`libs`**: List of internal npm package names to manage (optional)
 - **`groups`**: Named collections of micro frontend projects
   - **`all`**: Default group containing all projects (required)
   - **Custom groups**: Any additional groups you want to create

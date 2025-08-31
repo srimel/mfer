@@ -24,7 +24,7 @@ describe("lib commands integration", () => {
       expect(libCommand.default).toBeDefined();
       expect(libCommand.default.name()).toBe("lib");
       expect(libCommand.default.description()).toContain(
-        "Manage internal npm packages"
+        "Manage internal npm packages",
       );
     });
 
@@ -47,7 +47,7 @@ describe("lib commands integration", () => {
       expect(buildCommand.default).toBeDefined();
       expect(buildCommand.default.name()).toBe("build");
       expect(buildCommand.default.description()).toContain(
-        "Build internal npm packages"
+        "Build internal npm packages",
       );
     });
   });
@@ -59,7 +59,7 @@ describe("lib commands integration", () => {
       expect(deployCommand.default).toBeDefined();
       expect(deployCommand.default.name()).toBe("deploy");
       expect(deployCommand.default.description()).toContain(
-        "Copy built libraries"
+        "Copy built libraries",
       );
     });
   });
@@ -71,7 +71,7 @@ describe("lib commands integration", () => {
       expect(publishCommand.default).toBeDefined();
       expect(publishCommand.default.name()).toBe("publish");
       expect(publishCommand.default.description()).toContain(
-        "Build and deploy"
+        "Build and deploy",
       );
     });
   });
@@ -83,7 +83,7 @@ describe("lib commands integration", () => {
       expect(listCommand.default).toBeDefined();
       expect(listCommand.default.name()).toBe("list");
       expect(listCommand.default.description()).toContain(
-        "List configured libraries"
+        "List configured libraries",
       );
     });
   });
@@ -119,10 +119,10 @@ describe("lib commands integration", () => {
     it("should have buildLibrary function", () => {
       // Test the buildLibrary function logic
       const buildLibrary = async (
-        libPath: string,
-        libName: string
+        _libPath: string,
+        _libName: string,
       ): Promise<void> => {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, _reject) => {
           // Mock implementation for testing
           setTimeout(() => {
             resolve();
@@ -138,11 +138,11 @@ describe("lib commands integration", () => {
     it("should have copyLibraryToMfe function", () => {
       // Test the copyLibraryToMfe function logic
       const copyLibraryToMfe = async (
-        sourcePath: string,
-        targetPath: string,
-        libName: string
+        _sourcePath: string,
+        _targetPath: string,
+        _libName: string,
       ): Promise<void> => {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, _reject) => {
           // Mock implementation for testing
           setTimeout(() => {
             resolve();
@@ -153,7 +153,7 @@ describe("lib commands integration", () => {
       // The function should be defined and return a promise
       expect(typeof copyLibraryToMfe).toBe("function");
       expect(copyLibraryToMfe("/source", "/target", "test-lib")).toBeInstanceOf(
-        Promise
+        Promise,
       );
     });
   });
@@ -162,10 +162,10 @@ describe("lib commands integration", () => {
     it("should handle missing config gracefully", () => {
       const handleMissingConfig = () => {
         console.log(
-          chalk.red("Error: Library configuration not found in config file.")
+          chalk.red("Error: Library configuration not found in config file."),
         );
         console.log(
-          chalk.yellow("Please run 'mfer init' to configure library settings.")
+          chalk.yellow("Please run 'mfer init' to configure library settings."),
         );
       };
 
@@ -175,13 +175,13 @@ describe("lib commands integration", () => {
     it("should handle missing library gracefully", () => {
       const handleMissingLibrary = (
         libName: string,
-        availableLibs: string[]
+        availableLibs: string[],
       ) => {
         console.log(
-          chalk.red(`Error: Library '${libName}' not found in configuration.`)
+          chalk.red(`Error: Library '${libName}' not found in configuration.`),
         );
         console.log(
-          chalk.yellow(`Available libraries: ${availableLibs.join(", ")}`)
+          chalk.yellow(`Available libraries: ${availableLibs.join(", ")}`),
         );
       };
 
@@ -191,10 +191,10 @@ describe("lib commands integration", () => {
     it("should handle build directory not found gracefully", () => {
       const handleBuildDirNotFound = (libName: string) => {
         console.log(
-          chalk.red(`Error: Build directory not found for ${libName}`)
+          chalk.red(`Error: Build directory not found for ${libName}`),
         );
         console.log(
-          chalk.yellow(`Please run 'mfer lib build ${libName}' first.`)
+          chalk.yellow(`Please run 'mfer lib build ${libName}' first.`),
         );
       };
 
@@ -223,8 +223,8 @@ describe("lib commands integration", () => {
       const showPublishSuccess = (libName: string, mfeCount: number) => {
         console.log(
           chalk.green(
-            `✓ ${libName} published to ${mfeCount} MFE${mfeCount === 1 ? "" : "s"}`
-          )
+            `✓ ${libName} published to ${mfeCount} MFE${mfeCount === 1 ? "" : "s"}`,
+          ),
         );
       };
 

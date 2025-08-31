@@ -41,7 +41,7 @@ describe("config-utils with library support", () => {
       };
 
       expect(existingConfig.base_github_url).toBe(
-        "https://github.com/testuser"
+        "https://github.com/testuser",
       );
       expect(existingConfig.mfe_directory).toBe("/test/mfes");
       expect(existingConfig.groups.all).toEqual(["mfe1", "mfe2"]);
@@ -96,7 +96,7 @@ describe("config-utils with library support", () => {
       // Test that libs is properly typed as string array
       expect(Array.isArray(validConfig.libs)).toBe(true);
       expect(validConfig.libs?.every((lib) => typeof lib === "string")).toBe(
-        true
+        true,
       );
     });
 

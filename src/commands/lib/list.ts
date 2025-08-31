@@ -18,10 +18,10 @@ const listCommand = new Command("list")
 
     if (!currentConfig.lib_directory || !currentConfig.libs) {
       console.log(
-        chalk.red("Error: Library configuration not found in config file.")
+        chalk.red("Error: Library configuration not found in config file."),
       );
       console.log(
-        chalk.yellow("Please run 'mfer init' to configure library settings.")
+        chalk.yellow("Please run 'mfer init' to configure library settings."),
       );
       return;
     }
@@ -37,10 +37,10 @@ const listCommand = new Command("list")
     for (const lib of currentConfig.libs) {
       const libPath = path.join(currentConfig.lib_directory, lib);
       const distPath = path.join(libPath, "dist");
-      
+
       const libExists = fs.existsSync(libPath);
       const distExists = fs.existsSync(distPath);
-      
+
       let status = "";
       if (!libExists) {
         status = chalk.red("✗ Directory not found");
@@ -57,7 +57,9 @@ const listCommand = new Command("list")
     }
 
     console.log(chalk.gray("─".repeat(50)));
-    console.log(chalk.blue(`Library Directory: ${currentConfig.lib_directory}`));
+    console.log(
+      chalk.blue(`Library Directory: ${currentConfig.lib_directory}`),
+    );
     console.log(chalk.blue(`Total Libraries: ${currentConfig.libs.length}`));
   });
 

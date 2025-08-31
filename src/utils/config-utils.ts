@@ -55,7 +55,7 @@ export const isConfigValid = (): boolean => {
     const config = YAML.parse(configFile);
 
     // Check if config has required fields and they're not empty
-    const hasRequiredFields = 
+    const hasRequiredFields =
       config &&
       typeof config === "object" &&
       config.base_github_url &&

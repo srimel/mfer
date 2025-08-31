@@ -5,7 +5,9 @@ import publishCommand from "./publish.js";
 import listCommand from "./list.js";
 
 const libCommand = new Command("lib")
-  .description("Manage internal npm packages and their distribution to micro frontends")
+  .description(
+    "Manage internal npm packages and their distribution to micro frontends",
+  )
   .addCommand(buildCommand)
   .addCommand(deployCommand)
   .addCommand(publishCommand)

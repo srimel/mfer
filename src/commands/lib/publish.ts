@@ -3,6 +3,7 @@ import chalk from "chalk";
 import { spawn } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
+import { checkbox } from "@inquirer/prompts";
 import {
   currentConfig,
   configExists,
@@ -11,8 +12,12 @@ import {
 
 const publishCommand = new Command("publish")
   .description("Build and deploy libraries to micro frontends")
-  .argument("[lib-name]", "Name of the library to publish (publishes all if not specified)")
-  .action(async (libName?: string) => {
+  .argument(
+    "[lib-name]",
+    "Name of the library to publish (publishes all if not specified)",
+  )
+  .option("-s, --select", "prompt to select which libraries to publish")
+  .action(async (libName?: string, options?: { select?: boolean }) => {
     if (!configExists) {
       warnOfMissingConfig();
       return;
@@ -20,26 +25,53 @@ const publishCommand = new Command("publish")
 
     if (!currentConfig.lib_directory || !currentConfig.libs) {
       console.log(
-        chalk.red("Error: Library configuration not found in config file.")
+        chalk.red("Error: Library configuration not found in config file."),
       );
       console.log(
-        chalk.yellow("Please run 'mfer init' to configure library settings.")
+        chalk.yellow("Please run 'mfer init' to configure library settings."),
       );
       return;
     }
 
-    const libsToPublish = libName 
-      ? [libName].filter(lib => currentConfig.libs!.includes(lib))
-      : currentConfig.libs;
+    let libsToPublish: string[];
 
-    if (libName && !currentConfig.libs.includes(libName)) {
-      console.log(
-        chalk.red(`Error: Library '${libName}' not found in configuration.`)
-      );
-      console.log(
-        chalk.yellow(`Available libraries: ${currentConfig.libs.join(", ")}`)
-      );
-      return;
+    // If --select option is provided, prompt user to select libraries
+    if (options?.select) {
+      try {
+        console.log(chalk.blue(`Select libraries to publish:`));
+        const selectedLibs = await checkbox({
+          message: "Choose which libraries to publish:",
+          choices: currentConfig.libs.map((lib) => ({ name: lib, value: lib })),
+          validate: (arr) =>
+            arr.length > 0 ? true : "Select at least one library",
+        });
+        libsToPublish = selectedLibs;
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          (error.message?.includes("SIGINT") ||
+            error.message?.includes("User force closed"))
+        ) {
+          console.log(chalk.yellow("\nReceived SIGINT. Stopping..."));
+          process.exit(130);
+        }
+        throw error;
+      }
+    } else {
+      // Use existing logic for libName or all libs
+      libsToPublish = libName
+        ? [libName].filter((lib) => currentConfig.libs!.includes(lib))
+        : currentConfig.libs;
+
+      if (libName && !currentConfig.libs.includes(libName)) {
+        console.log(
+          chalk.red(`Error: Library '${libName}' not found in configuration.`),
+        );
+        console.log(
+          chalk.yellow(`Available libraries: ${currentConfig.libs.join(", ")}`),
+        );
+        return;
+      }
     }
 
     if (libsToPublish.length === 0) {
@@ -47,25 +79,31 @@ const publishCommand = new Command("publish")
       return;
     }
 
-    console.log(
-      chalk.blue(`Publishing ${libsToPublish.length} librar${libsToPublish.length === 1 ? 'y' : 'ies'}...`)
-    );
+    const libsText = options?.select
+      ? `selected libraries (${libsToPublish.length})`
+      : libName
+        ? `library '${libName}'`
+        : `all libraries (${libsToPublish.length})`;
+
+    console.log(chalk.blue(`Publishing ${libsText}...`));
 
     // Get all MFE directories
-    const mfeDirectories = currentConfig.groups.all.map(mfe => 
-      path.join(currentConfig.mfe_directory, mfe)
+    const mfeDirectories = currentConfig.groups.all.map((mfe) =>
+      path.join(currentConfig.mfe_directory, mfe),
     );
 
     for (const lib of libsToPublish) {
       const libPath = path.join(currentConfig.lib_directory, lib);
-      
+
       if (!fs.existsSync(libPath)) {
-        console.log(chalk.red(`Error: Library directory not found: ${libPath}`));
+        console.log(
+          chalk.red(`Error: Library directory not found: ${libPath}`),
+        );
         continue;
       }
 
       console.log(chalk.blue(`\nPublishing ${chalk.bold(lib)}...`));
-      
+
       // Step 1: Build the library
       console.log(chalk.blue(`  Building ${lib}...`));
       try {
@@ -80,10 +118,12 @@ const publishCommand = new Command("publish")
       console.log(chalk.blue(`  Deploying ${lib}...`));
       const libDistPath = path.join(libPath, "dist");
       let deployedCount = 0;
-      
+
       for (const mfeDir of mfeDirectories) {
         if (!fs.existsSync(mfeDir)) {
-          console.log(chalk.yellow(`    Warning: MFE directory not found: ${mfeDir}`));
+          console.log(
+            chalk.yellow(`    Warning: MFE directory not found: ${mfeDir}`),
+          );
           continue;
         }
 
@@ -91,27 +131,45 @@ const publishCommand = new Command("publish")
         if (fs.existsSync(targetPath)) {
           try {
             await copyLibraryToMfe(libDistPath, targetPath, lib);
-            console.log(chalk.green(`    ✓ Deployed to ${path.basename(mfeDir)}`));
+            console.log(
+              chalk.green(`    ✓ Deployed to ${path.basename(mfeDir)}`),
+            );
             deployedCount++;
           } catch (error) {
-            console.log(chalk.red(`    ✗ Failed to deploy to ${path.basename(mfeDir)}: ${error}`));
+            console.log(
+              chalk.red(
+                `    ✗ Failed to deploy to ${path.basename(mfeDir)}: ${error}`,
+              ),
+            );
           }
         } else {
-          console.log(chalk.gray(`    - Skipped ${path.basename(mfeDir)} (not installed)`));
+          console.log(
+            chalk.gray(
+              `    - Skipped ${path.basename(mfeDir)} (not installed)`,
+            ),
+          );
         }
       }
 
       if (deployedCount > 0) {
-        console.log(chalk.green(`  ✓ ${lib} published to ${deployedCount} MFE${deployedCount === 1 ? '' : 's'}`));
+        console.log(
+          chalk.green(
+            `  ✓ ${lib} published to ${deployedCount} MFE${deployedCount === 1 ? "" : "s"}`,
+          ),
+        );
       } else {
-        console.log(chalk.yellow(`  ⚠ ${lib} not deployed (not found in any MFE's node_modules)`));
+        console.log(
+          chalk.yellow(
+            `  ⚠ ${lib} not deployed (not found in any MFE's node_modules)`,
+          ),
+        );
       }
     }
 
     console.log(chalk.green("\nPublish process completed!"));
   });
 
-async function buildLibrary(libPath: string, libName: string): Promise<void> {
+async function buildLibrary(libPath: string, _libName: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const buildProcess = spawn("npm", ["run", "build"], {
       stdio: "inherit",
@@ -133,8 +191,12 @@ async function buildLibrary(libPath: string, libName: string): Promise<void> {
   });
 }
 
-async function copyLibraryToMfe(sourcePath: string, targetPath: string, libName: string): Promise<void> {
-  return new Promise((resolve, reject) => {
+async function copyLibraryToMfe(
+  sourcePath: string,
+  targetPath: string,
+  _libName: string,
+): Promise<void> {
+  return new Promise((resolve, _reject) => {
     // Remove existing contents
     if (fs.existsSync(targetPath)) {
       fs.rmSync(targetPath, { recursive: true, force: true });
@@ -155,13 +217,13 @@ function copyDirectoryRecursive(source: string, target: string): void {
   }
 
   const items = fs.readdirSync(source);
-  
+
   for (const item of items) {
     const sourcePath = path.join(source, item);
     const targetPath = path.join(target, item);
-    
+
     const stat = fs.statSync(sourcePath);
-    
+
     if (stat.isDirectory()) {
       copyDirectoryRecursive(sourcePath, targetPath);
     } else {
