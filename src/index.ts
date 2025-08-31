@@ -7,6 +7,7 @@ import runCommand from "./commands/run.js";
 import installCommand from "./commands/install.js";
 import cloneCommand from "./commands/clone.js";
 import pullCommand from "./commands/pull.js";
+import libCommand from "./commands/lib/index.js";
 import { loadConfig } from "./utils/config-utils.js";
 
 // General
@@ -15,7 +16,7 @@ program
   .description(
     "Micro Frontend Runner (mfer) - A CLI for running your project's micro frontends."
   )
-  .version("1.5.0", "-v, --version", "mfer CLI version")
+  .version("2.0.0", "-v, --version", "mfer CLI version")
   .hook("preAction", () => {
     console.log();
   })
@@ -30,6 +31,7 @@ program.addCommand(runCommand);
 program.addCommand(installCommand);
 program.addCommand(cloneCommand);
 program.addCommand(pullCommand);
+program.addCommand(libCommand);
 
 // Configuration
 loadConfig();

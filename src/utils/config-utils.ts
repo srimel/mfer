@@ -8,6 +8,8 @@ import { spawn } from "child_process";
 export interface MferConfig {
   base_github_url: string;
   mfe_directory: string;
+  lib_directory?: string;
+  libs?: string[];
   groups: {
     all: string[];
     [groupname: string]: string[];
@@ -53,7 +55,7 @@ export const isConfigValid = (): boolean => {
     const config = YAML.parse(configFile);
 
     // Check if config has required fields and they're not empty
-    return (
+    const hasRequiredFields = 
       config &&
       typeof config === "object" &&
       config.base_github_url &&
@@ -62,8 +64,14 @@ export const isConfigValid = (): boolean => {
       typeof config.groups === "object" &&
       config.groups.all &&
       Array.isArray(config.groups.all) &&
-      config.groups.all.length > 0
-    );
+      config.groups.all.length > 0;
+
+    // If lib_directory is provided, libs should also be provided
+    if (config.lib_directory && (!config.libs || !Array.isArray(config.libs))) {
+      return false;
+    }
+
+    return hasRequiredFields;
   } catch {
     // If parsing fails or any other error, config is invalid
     return false;
