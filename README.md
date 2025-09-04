@@ -13,6 +13,7 @@ A powerful CLI tool designed to simplify the management and execution of multipl
 - [⚙️ Configuration](#️-configuration)
 - [🎯 Use Cases](#-use-cases)
 - [🔧 Advanced Usage](#-advanced-usage)
+- [🛠️ Development](#️-development)
 - [🐛 Troubleshooting](#-troubleshooting)
 - [🤝 Contributing](#-contributing)
 - [📄 License](#-license)
@@ -415,6 +416,30 @@ mfer respects your existing environment setup and will use the same Node.js and 
 - Use Ctrl+C to gracefully shut down all running services
 - Failed processes are reported with detailed error information
 
+## 🛠️ Development
+
+### Local Development Setup
+
+For contributing to mfer or setting up a local development environment:
+
+```bash
+git clone https://github.com/srimel/mfer.git
+cd mfer
+npm install
+npm run build
+npm install -g .
+```
+
+### Testing with Playground
+
+The project includes a comprehensive playground for testing mfer commands with sample micro frontends. The playground contains:
+
+- **libs/common-utils**: A shared utility library
+- **frontends/mfe1, mfe2, mfe3**: Three React micro frontends with different themes
+- Complete setup instructions and testing scenarios
+
+📖 **[View detailed local development guide →](./docs/local-development.md)**
+
 ## 🐛 Troubleshooting
 
 ### Common Issues
@@ -446,20 +471,6 @@ mfer config edit
 
 - Ensure all projects in your configuration are valid git repositories
 - Run `mfer clone` to clone missing repositories
-
-### Development Mode
-
-For local development of mfer itself:
-
-```bash
-git clone https://github.com/srimel/mfer.git
-cd mfer
-npm install
-npm run build
-npm install -g .
-```
-
-Refer to [local development](./docs/local-development.md) docs for more information.
 
 ## 🤝 Contributing
 

@@ -1,0 +1,31 @@
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: #282c34;
+  padding: 20px;
+  color: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+}
+
+.App-header h1 {
+  color: #61dafb;
+  margin-bottom: 20px;
+}
+
+.App-header p {
+  margin: 10px 0;
+  font-size: 18px;
+}
+
+.timestamp {
+  margin-top: 30px;
+  font-size: 14px;
+  color: #888;
+}
