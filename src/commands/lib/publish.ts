@@ -9,6 +9,7 @@ import {
   configExists,
   warnOfMissingConfig,
 } from "../../utils/config-utils.js";
+import { resolvePackageName } from "../../utils/lib-utils.js";
 
 const publishCommand = new Command("publish")
   .description("Build and deploy libraries to micro frontends")
@@ -117,6 +118,12 @@ const publishCommand = new Command("publish")
       // Step 2: Deploy the library
       console.log(chalk.blue(`  Deploying ${lib}...`));
       const libDistPath = path.join(libPath, "dist");
+
+      // Resolve the actual package name from package.json
+      const actualPackageName = resolvePackageName(
+        lib,
+        currentConfig.lib_directory,
+      );
       let deployedCount = 0;
 
       for (const mfeDir of mfeDirectories) {
@@ -127,7 +134,8 @@ const publishCommand = new Command("publish")
           continue;
         }
 
-        const targetPath = path.join(mfeDir, "node_modules", lib);
+        // Use the actual package name for the node_modules path
+        const targetPath = path.join(mfeDir, "node_modules", actualPackageName);
         if (fs.existsSync(targetPath)) {
           try {
             await copyLibraryToMfe(libDistPath, targetPath, lib);
