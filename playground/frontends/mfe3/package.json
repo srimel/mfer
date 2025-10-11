@@ -6,7 +6,7 @@
     "common-utils": "file:../../libs/common-utils",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^0.0.0"
   },
   "devDependencies": {
     "cross-env": "^7.0.3"

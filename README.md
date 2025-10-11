@@ -151,11 +151,17 @@ Pull latest changes from git repositories.
 
 - `group_name`: Name of the group to pull from (defaults to "all")
 
-**Example:**
+**Options:**
+
+- `-s, --select`: Prompt to select which repositories to pull
+
+**Examples:**
 
 ```bash
 mfer pull         # Pull from all repositories
 mfer pull shared  # Pull from shared components group only
+mfer pull --select # Select repositories to pull interactively
+mfer pull frontend --select # Select repositories from frontend group
 ```
 
 ### `mfer install [group_name]`
@@ -166,11 +172,17 @@ Install dependencies for all micro frontends in a group.
 
 - `group_name`: Name of the group to install dependencies for (defaults to "all")
 
-**Example:**
+**Options:**
+
+- `-s, --select`: Prompt to select which micro frontends to install
+
+**Examples:**
 
 ```bash
 mfer install          # Install dependencies for all micro frontends
 mfer install frontend # Install dependencies for frontend group only
+mfer install --select # Select micro frontends to install interactively
+mfer install shared --select # Select micro frontends from shared group
 ```
 
 ### `mfer clone [group_name]`
@@ -226,6 +238,8 @@ Manage internal npm packages and their distribution to micro frontends.
 - [`mfer lib deploy`](#mfer-lib-deploy-lib-name) - Copy built libraries to micro frontends
 - [`mfer lib publish`](#mfer-lib-publish-lib-name) - Build and deploy libraries to micro frontends
 - [`mfer lib list`](#mfer-lib-list) - List configured libraries and their status
+- [`mfer lib pull`](#mfer-lib-pull-lib-name) - Pull latest changes from library git repositories
+- [`mfer lib install`](#mfer-lib-install-lib-name) - Install dependencies for libraries
 
 ### `mfer lib build [lib-name]`
 
@@ -295,6 +309,48 @@ List configured libraries and their status.
 
 ```bash
 mfer lib list    # Show all configured libraries and their build status
+```
+
+### `mfer lib pull [lib-name]`
+
+Pull latest changes from library git repositories.
+
+**Arguments:**
+
+- `lib-name`: Name of the library to pull from (pulls all if not specified)
+
+**Options:**
+
+- `-s, --select`: Prompt to select which libraries to pull
+
+**Examples:**
+
+```bash
+mfer lib pull                    # Pull from all libraries
+mfer lib pull my-shared-utils    # Pull from specific library only
+mfer lib pull --select           # Select libraries to pull interactively
+mfer lib pull my-design-system --select # Select libraries from specific library
+```
+
+### `mfer lib install [lib-name]`
+
+Install dependencies for libraries.
+
+**Arguments:**
+
+- `lib-name`: Name of the library to install dependencies for (installs all if not specified)
+
+**Options:**
+
+- `-s, --select`: Prompt to select which libraries to install
+
+**Examples:**
+
+```bash
+mfer lib install                    # Install dependencies for all libraries
+mfer lib install my-shared-utils    # Install dependencies for specific library only
+mfer lib install --select           # Select libraries to install interactively
+mfer lib install my-design-system --select # Select libraries from specific library
 ```
 
 ## ⚙️ Configuration

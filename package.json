@@ -1,6 +1,6 @@
 {
   "name": "mfer",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "description": "CLI tool designed to sensibly run micro-frontends from the terminal.",
   "bin": {
     "mfer": "dist/index.js"
