@@ -15,7 +15,7 @@ const installCommand = new Command("install")
   .argument(
     "[group_name]",
     "name of the group as specified in the configuration",
-    "all"
+    "all",
   )
   .option("-s, --select", "prompt to select which micro frontends to install")
   .action(async (groupName, options) => {
@@ -30,15 +30,15 @@ const installCommand = new Command("install")
       console.log(`${messagePrefix}: no group found with name '${groupName}'`);
       console.log(
         `Available groups: ${chalk.green(
-          Object.keys(currentConfig.groups).join(" ")
-        )}`
+          Object.keys(currentConfig.groups).join(" "),
+        )}`,
       );
       return;
     }
     if (!Array.isArray(group) || group.length === 0) {
       const messagePrefix = chalk.red("Error");
       console.log(
-        `${messagePrefix}: group '${groupName}' has no micro frontends defined.`
+        `${messagePrefix}: group '${groupName}' has no micro frontends defined.`,
       );
       return;
     }

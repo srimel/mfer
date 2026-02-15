@@ -14,7 +14,7 @@ const installCommand = new Command("install")
   .description("run 'npm install' in library directories")
   .argument(
     "[lib-name]",
-    "name of the library to install dependencies for (installs all if not specified)"
+    "name of the library to install dependencies for (installs all if not specified)",
   )
   .option("-s, --select", "prompt to select which libraries to install")
   .action(async (libName, options) => {
@@ -25,10 +25,10 @@ const installCommand = new Command("install")
 
     if (!currentConfig.lib_directory || !currentConfig.libs) {
       console.log(
-        chalk.red("Error: Library configuration not found in config file.")
+        chalk.red("Error: Library configuration not found in config file."),
       );
       console.log(
-        chalk.yellow("Please run 'mfer init' to configure library settings.")
+        chalk.yellow("Please run 'mfer init' to configure library settings."),
       );
       return;
     }
@@ -44,10 +44,10 @@ const installCommand = new Command("install")
       // Check if the specified library exists
       if (!currentConfig.libs.includes(libName)) {
         console.log(
-          chalk.red(`Error: Library '${libName}' not found in configuration.`)
+          chalk.red(`Error: Library '${libName}' not found in configuration.`),
         );
         console.log(
-          `Available libraries: ${chalk.green(currentConfig.libs.join(" "))}`
+          `Available libraries: ${chalk.green(currentConfig.libs.join(" "))}`,
         );
         return;
       }

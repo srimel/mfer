@@ -8,7 +8,7 @@ import installCommand from "./install.js";
 
 const libCommand = new Command("lib")
   .description(
-    "Manage internal npm packages and their distribution to micro frontends"
+    "Manage internal npm packages and their distribution to micro frontends",
   )
   .addCommand(buildCommand)
   .addCommand(deployCommand)
