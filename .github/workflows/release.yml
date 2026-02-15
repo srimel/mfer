@@ -27,7 +27,6 @@ jobs:
           cache: "npm"
           registry-url: "https://registry.npmjs.org"
 
-      # CRITICAL: Upgrade npm from 10.9.4 to 11.x for trusted publishing
       - name: Update npm to latest
         run: npm install -g npm@latest
 
