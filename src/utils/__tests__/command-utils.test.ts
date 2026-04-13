@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { promptForMFESelection } from "../command-utils.js";
+import { promptForMFESelection, resolveRunCommand } from "../command-utils.js";
+import type { MferConfig } from "../config-utils.js";
 
 // Mock the @inquirer/prompts module
 vi.mock("@inquirer/prompts", () => ({
@@ -14,17 +15,103 @@ vi.mock("chalk", () => ({
   },
 }));
 
-// Mock process.exit to prevent actual exit
-const mockExit = vi.spyOn(process, "exit").mockImplementation((code) => {
-  throw new Error(`process.exit called with code ${code}`);
-});
+// Declared as let so beforeEach can re-initialize them after restoreAllMocks()
+let mockExit: ReturnType<typeof vi.spyOn<typeof process, "exit">>;
+let mockConsoleLog: ReturnType<typeof vi.spyOn<Console, "log">>;
 
-// Mock console.log to capture output
-const mockConsoleLog = vi.spyOn(console, "log").mockImplementation(() => {});
+const baseConfig: MferConfig = {
+  base_github_url: "https://github.com/test",
+  mfe_directory: "/test/mfe",
+  groups: { all: ["root-config", "mfe1", "mfe2"] },
+};
 
 describe("command-utils", () => {
+  describe("resolveRunCommand", () => {
+    it("returns npm start when no mode is given", () => {
+      expect(resolveRunCommand("root-config", undefined, baseConfig)).toBe(
+        "npm start",
+      );
+    });
+
+    it("returns the mode command when the MFE has a matching mode", () => {
+      const config: MferConfig = {
+        ...baseConfig,
+        mfes: {
+          "root-config": {
+            modes: [{ mode_name: "mock", command: "npm run start:mocked" }],
+          },
+        },
+      };
+      expect(resolveRunCommand("root-config", "mock", config)).toBe(
+        "npm run start:mocked",
+      );
+    });
+
+    it("falls back to npm start when the MFE has no matching mode", () => {
+      const config: MferConfig = {
+        ...baseConfig,
+        mfes: {
+          "root-config": {
+            modes: [{ mode_name: "mock", command: "npm run start:mocked" }],
+          },
+        },
+      };
+      expect(resolveRunCommand("mfe1", "mock", config)).toBe("npm start");
+    });
+
+    it("falls back to npm start when the mode name does not match any defined mode", () => {
+      const config: MferConfig = {
+        ...baseConfig,
+        mfes: {
+          "root-config": {
+            modes: [{ mode_name: "mock", command: "npm run start:mocked" }],
+          },
+        },
+      };
+      expect(resolveRunCommand("root-config", "unknown-mode", config)).toBe(
+        "npm start",
+      );
+    });
+
+    it("falls back to npm start when the mfes section is absent", () => {
+      expect(resolveRunCommand("root-config", "mock", baseConfig)).toBe(
+        "npm start",
+      );
+    });
+
+    it("falls back to npm start when the MFE entry has no modes array", () => {
+      const config: MferConfig = {
+        ...baseConfig,
+        mfes: { "root-config": {} },
+      };
+      expect(resolveRunCommand("root-config", "mock", config)).toBe(
+        "npm start",
+      );
+    });
+
+    it("selects the correct mode when an MFE has multiple modes", () => {
+      const config: MferConfig = {
+        ...baseConfig,
+        mfes: {
+          "root-config": {
+            modes: [
+              { mode_name: "mock", command: "npm run start:mocked" },
+              { mode_name: "dev", command: "npm run start:dev" },
+            ],
+          },
+        },
+      };
+      expect(resolveRunCommand("root-config", "dev", config)).toBe(
+        "npm run start:dev",
+      );
+    });
+  });
   beforeEach(() => {
     vi.clearAllMocks();
+    mockExit = vi.spyOn(process, "exit").mockImplementation((code) => {
+      throw new Error(`process.exit called with code ${code}`);
+    });
+    mockConsoleLog = vi.spyOn(console, "log").mockImplementation(() => {});
   });
 
   afterEach(() => {

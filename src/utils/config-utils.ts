@@ -5,6 +5,15 @@ import YAML from "yaml";
 import chalk from "chalk";
 import { spawn } from "child_process";
 
+export interface MfeMode {
+  mode_name: string;
+  command: string;
+}
+
+export interface MfeConfig {
+  modes?: MfeMode[];
+}
+
 export interface MferConfig {
   base_github_url: string;
   mfe_directory: string;
@@ -13,6 +22,9 @@ export interface MferConfig {
   groups: {
     all: string[];
     [groupname: string]: string[];
+  };
+  mfes?: {
+    [mfeName: string]: MfeConfig;
   };
 }
 
@@ -69,6 +81,29 @@ export const isConfigValid = (): boolean => {
     // If lib_directory is provided, libs should also be provided
     if (config.lib_directory && (!config.libs || !Array.isArray(config.libs))) {
       return false;
+    }
+
+    // If mfes is provided, validate each entry's modes have required fields
+    if (config.mfes && typeof config.mfes === "object") {
+      for (const mfeConfig of Object.values(config.mfes)) {
+        if (
+          mfeConfig &&
+          (mfeConfig as { modes?: unknown }).modes !== undefined
+        ) {
+          const modes = (mfeConfig as { modes: unknown }).modes;
+          if (!Array.isArray(modes)) return false;
+          for (const mode of modes) {
+            if (
+              !mode ||
+              typeof mode !== "object" ||
+              !mode.mode_name ||
+              !mode.command
+            ) {
+              return false;
+            }
+          }
+        }
+      }
     }
 
     return hasRequiredFields;
