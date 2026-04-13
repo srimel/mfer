@@ -186,6 +186,86 @@ describe("config-utils", () => {
 
       expect(result).toBe(true);
     });
+
+    it("should return true when config has a valid mfes section", async () => {
+      const validConfig = {
+        base_github_url: "https://github.com",
+        mfe_directory: "/path/to/mfe",
+        groups: { all: ["app1", "app2"] },
+        mfes: {
+          app1: {
+            modes: [{ mode_name: "mock", command: "npm run start:mocked" }],
+          },
+        },
+      };
+
+      mockFs.existsSync.mockReturnValue(true);
+      mockFs.readFileSync.mockReturnValue("mock yaml content");
+      mockYaml.parse.mockReturnValue(validConfig);
+
+      const { isConfigValid } = await import("../config-utils.js");
+
+      expect(isConfigValid()).toBe(true);
+    });
+
+    it("should return false when a mode entry is missing command", async () => {
+      const invalidConfig = {
+        base_github_url: "https://github.com",
+        mfe_directory: "/path/to/mfe",
+        groups: { all: ["app1"] },
+        mfes: {
+          app1: {
+            modes: [{ mode_name: "mock" }], // missing command
+          },
+        },
+      };
+
+      mockFs.existsSync.mockReturnValue(true);
+      mockFs.readFileSync.mockReturnValue("mock yaml content");
+      mockYaml.parse.mockReturnValue(invalidConfig);
+
+      const { isConfigValid } = await import("../config-utils.js");
+
+      expect(isConfigValid()).toBe(false);
+    });
+
+    it("should return false when a mode entry is missing mode_name", async () => {
+      const invalidConfig = {
+        base_github_url: "https://github.com",
+        mfe_directory: "/path/to/mfe",
+        groups: { all: ["app1"] },
+        mfes: {
+          app1: {
+            modes: [{ command: "npm run start:mocked" }], // missing mode_name
+          },
+        },
+      };
+
+      mockFs.existsSync.mockReturnValue(true);
+      mockFs.readFileSync.mockReturnValue("mock yaml content");
+      mockYaml.parse.mockReturnValue(invalidConfig);
+
+      const { isConfigValid } = await import("../config-utils.js");
+
+      expect(isConfigValid()).toBe(false);
+    });
+
+    it("should return false when modes is not an array", async () => {
+      const invalidConfig = {
+        base_github_url: "https://github.com",
+        mfe_directory: "/path/to/mfe",
+        groups: { all: ["app1"] },
+        mfes: { app1: { modes: "not-an-array" } },
+      };
+
+      mockFs.existsSync.mockReturnValue(true);
+      mockFs.readFileSync.mockReturnValue("mock yaml content");
+      mockYaml.parse.mockReturnValue(invalidConfig);
+
+      const { isConfigValid } = await import("../config-utils.js");
+
+      expect(isConfigValid()).toBe(false);
+    });
   });
 
   describe("saveConfig", () => {

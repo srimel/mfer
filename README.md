@@ -95,7 +95,7 @@ mfer pull frontend
 ### Quick Reference
 
 - [`mfer init`](#mfer-init) - Interactive setup wizard
-- [`mfer run`](#mfer-run-group_name) - Run micro frontend applications
+- [`mfer run`](#mfer-run-group_name) - Run micro frontend applications (supports per-MFE run modes)
 - [`mfer pull`](#mfer-pull-group_name) - Pull latest changes from git repositories
 - [`mfer install`](#mfer-install-group_name) - Install dependencies for micro frontends
 - [`mfer clone`](#mfer-clone-group_name) - Clone repositories that don't exist locally
@@ -127,20 +127,24 @@ Run micro frontend applications concurrently.
 
 **Options:**
 
-- `-c, --command <command>`: Custom command to run (default: npm start)
-- `-a, --async`: Run custom command concurrently instead of sequentially
+- `-c, --command <command>`: Custom command to run for all MFEs (default: npm start)
+- `-a, --async`: Run custom command concurrently instead of sequentially (only with `--command`)
+- `-m, --mode <mode_name>`: Run MFEs using a named mode from config (see [Per-MFE Run Modes](#per-mfe-run-modes))
 - `-s, --select`: Prompt to select which micro frontends to run
+
+> **Note:** `--mode` and `--command` are mutually exclusive.
 
 **Examples:**
 
 ```bash
-mfer run                    # Run all micro frontends with default command (npm start)
-mfer run frontend          # Run only frontend group with default command
-mfer run --command "npm ci" home    # Run custom command sequentially on home group
-mfer run -c "yarn install" shared  # Run yarn install sequentially on shared group
+mfer run                          # Run all MFEs with default command (npm start)
+mfer run frontend                 # Run frontend group with default command
+mfer run --mode mock              # Run all MFEs in mock mode (per-MFE commands from config)
+mfer run frontend --mode mock     # Run frontend group in mock mode
+mfer run --command "npm ci" home  # Run custom command sequentially on home group
+mfer run -c "yarn install" shared # Run yarn install sequentially on shared group
 mfer run --command "npm ci" --async home  # Run custom command concurrently on home group
-mfer run -c "yarn install" -a shared  # Run yarn install concurrently on shared group
-mfer run --command "npm run build" --select  # Select MFEs and run build command sequentially
+mfer run --command "npm run build" --select  # Select MFEs and run build sequentially
 ```
 
 ### `mfer pull [group_name]`
@@ -376,6 +380,11 @@ groups:
   admin:
     - my-admin-panel
     - my-shared-components
+mfes: # optional, per-MFE configuration
+  my-main-app:
+    modes:
+      - mode_name: mock
+        command: npm run start:mocked
 ```
 
 ### Configuration Options
@@ -387,6 +396,42 @@ groups:
 - **`groups`**: Named collections of micro frontend projects
   - **`all`**: Default group containing all projects (required)
   - **Custom groups**: Any additional groups you want to create
+- **`mfes`**: Per-MFE configuration (optional). Each key is an MFE name matching one in `groups`.
+  - **`modes`**: Array of named run modes for the MFE. Each mode has:
+    - **`mode_name`**: Name used with `mfer run --mode <name>`
+    - **`command`**: The command to run for this MFE when the mode is active
+
+### Per-MFE Run Modes
+
+Run modes let individual MFEs use a different start command while the rest of the group continue using `npm start`. This is useful when some MFEs support a mocked/stubbed backend while others don't need it.
+
+**Config example** — `root-config` runs with a mocked API, everything else runs normally:
+
+```yaml
+groups:
+  all:
+    - root-config
+    - mfe-nav
+    - mfe-dashboard
+mfes:
+  root-config:
+    modes:
+      - mode_name: mock
+        command: npm run start:mocked
+```
+
+**Usage:**
+
+```bash
+mfer run --mode mock
+# root-config → npm run start:mocked
+# mfe-nav     → npm start  (no mock mode defined, falls back to default)
+# mfe-dashboard → npm start
+```
+
+- MFEs that **do not** have the mode defined silently fall back to `npm start`.
+- If **no MFE** in the group has the requested mode, a warning is printed but the command still runs (all MFEs use `npm start`).
+- `--mode` cannot be combined with `--command`; they are mutually exclusive.
 
 ### Editing Configuration
 
@@ -456,11 +501,10 @@ groups:
 
 ### Custom Start Commands
 
-By default, mfer runs `npm start` in each project directory.
-You can currently only customize this by modifying the run command in the source code.
+By default, mfer runs `npm start` in each project directory. You can customize this in two ways:
 
-Adding configurable custom start commands is something I plan on adding in the near future.
-I also welcome anyone to open a PR for that!
+- **Same command for all MFEs**: use `--command` (e.g. `mfer run --command "yarn start"`)
+- **Per-MFE commands via modes**: define `mfes[name].modes` in config and use `--mode` (see [Per-MFE Run Modes](#per-mfe-run-modes))
 
 ### Environment Variables
 
