@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import YAML from "yaml";
+import { parse as parseToml, stringify as stringifyToml } from "smol-toml";
 import chalk from "chalk";
 import { spawn } from "child_process";
 
@@ -28,7 +28,7 @@ export interface MferConfig {
   };
 }
 
-export const configPath: string = path.join(os.homedir(), ".mfer/config.yaml");
+export const configPath: string = path.join(os.homedir(), ".mfer/config.toml");
 export const configExists: boolean = fs.existsSync(configPath);
 export let currentConfig: MferConfig;
 
@@ -39,7 +39,7 @@ export let currentConfig: MferConfig;
 export const loadConfig = (): MferConfig | undefined => {
   if (configExists) {
     const configFile = fs.readFileSync(configPath, "utf8");
-    currentConfig = YAML.parse(configFile);
+    currentConfig = parseToml(configFile) as unknown as MferConfig;
     return currentConfig;
   }
   return undefined;
@@ -64,19 +64,22 @@ export const isConfigValid = (): boolean => {
 
   try {
     const configFile = fs.readFileSync(configPath, "utf8");
-    const config = YAML.parse(configFile);
+    const config = parseToml(configFile) as Partial<MferConfig> & {
+      mfes?: Record<string, unknown>;
+    };
 
     // Check if config has required fields and they're not empty
-    const hasRequiredFields =
+    const hasRequiredFields = Boolean(
       config &&
-      typeof config === "object" &&
-      config.base_github_url &&
-      config.mfe_directory &&
-      config.groups &&
-      typeof config.groups === "object" &&
-      config.groups.all &&
-      Array.isArray(config.groups.all) &&
-      config.groups.all.length > 0;
+        typeof config === "object" &&
+        config.base_github_url &&
+        config.mfe_directory &&
+        config.groups &&
+        typeof config.groups === "object" &&
+        config.groups.all &&
+        Array.isArray(config.groups.all) &&
+        config.groups.all.length > 0,
+    );
 
     // If lib_directory is provided, libs should also be provided
     if (config.lib_directory && (!config.libs || !Array.isArray(config.libs))) {
@@ -119,7 +122,10 @@ export const saveConfig = (newConfig: MferConfig) => {
     if (!fs.existsSync(configDir)) {
       fs.mkdirSync(configDir, { recursive: true });
     }
-    fs.writeFileSync(configPath, YAML.stringify(newConfig));
+    fs.writeFileSync(
+      configPath,
+      stringifyToml(newConfig as unknown as Record<string, unknown>),
+    );
   } catch (error) {
     console.log(`Error writing config file!\n\n${error}`);
   }
