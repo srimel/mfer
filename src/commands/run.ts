@@ -53,8 +53,8 @@ const runCommand = new Command("run")
       return;
     }
 
-    // Check if --async is used without --command
-    if (options.async && !options.command) {
+    // Check if --async is used without --command (--mode always runs concurrently, so --async is ignored there)
+    if (options.async && !options.command && !options.mode) {
       const messagePrefix = chalk.red("Error");
       console.log(
         `${messagePrefix}: --async can only be used with --command option`,

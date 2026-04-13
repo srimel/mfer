@@ -83,6 +83,29 @@ export const isConfigValid = (): boolean => {
       return false;
     }
 
+    // If mfes is provided, validate each entry's modes have required fields
+    if (config.mfes && typeof config.mfes === "object") {
+      for (const mfeConfig of Object.values(config.mfes)) {
+        if (
+          mfeConfig &&
+          (mfeConfig as { modes?: unknown }).modes !== undefined
+        ) {
+          const modes = (mfeConfig as { modes: unknown }).modes;
+          if (!Array.isArray(modes)) return false;
+          for (const mode of modes) {
+            if (
+              !mode ||
+              typeof mode !== "object" ||
+              !mode.mode_name ||
+              !mode.command
+            ) {
+              return false;
+            }
+          }
+        }
+      }
+    }
+
     return hasRequiredFields;
   } catch {
     // If parsing fails or any other error, config is invalid

@@ -302,4 +302,22 @@ describe("run command", () => {
       expect.stringContaining("Running mode 'mock' on micro frontends in"),
     );
   });
+
+  it("should not error when --async is combined with --mode (--async is ignored, mode always runs concurrently)", async () => {
+    const concurrently = (await import("concurrently")).default;
+
+    await runCommand.parseAsync([
+      "node",
+      "mfer",
+      "mocked",
+      "--mode",
+      "mock",
+      "--async",
+    ]);
+
+    expect(mockConsoleLog).not.toHaveBeenCalledWith(
+      expect.stringContaining("Error:"),
+    );
+    expect(concurrently).toHaveBeenCalled();
+  });
 });

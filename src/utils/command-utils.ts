@@ -6,10 +6,12 @@ import path from "path";
 import fs from "fs";
 import type { MferConfig } from "./config-utils.js";
 
+export const DEFAULT_RUN_COMMAND = "npm start";
+
 /**
  * Resolves the run command for a given MFE based on an optional mode name.
  * Returns the command defined for the mode in the MFE's config, or falls back
- * to 'npm start' if no mode is specified or the MFE has no matching mode.
+ * to DEFAULT_RUN_COMMAND if no mode is specified or the MFE has no matching mode.
  * @param mfe - The micro frontend name
  * @param modeName - Optional mode name to look up
  * @param config - The loaded mfer configuration
@@ -20,9 +22,9 @@ export function resolveRunCommand(
   modeName: string | undefined,
   config: MferConfig,
 ): string {
-  if (!modeName) return "npm start";
+  if (!modeName) return DEFAULT_RUN_COMMAND;
   const mode = config.mfes?.[mfe]?.modes?.find((m) => m.mode_name === modeName);
-  return mode?.command ?? "npm start";
+  return mode?.command ?? DEFAULT_RUN_COMMAND;
 }
 
 /**
