@@ -13,8 +13,6 @@ import {
 } from "../utils/command-utils.js";
 import { spawn } from "child_process";
 
-const DEFAULT_RUN_COMMAND = "npm start";
-
 interface MfeCommand {
   mfe: string;
   command: string;
