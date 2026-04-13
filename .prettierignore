@@ -1,0 +1,11 @@
+.beads/dolt/
+.beads/backup/
+.beads/*.lock
+.beads/*.log
+.beads/*.pid
+.beads/*.pid.lock
+.beads/*.activity
+.beads/interactions.jsonl
+.beads/last-touched
+dist/
+node_modules/

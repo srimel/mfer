@@ -21,9 +21,7 @@ export function resolveRunCommand(
   config: MferConfig,
 ): string {
   if (!modeName) return "npm start";
-  const mode = config.mfes?.[mfe]?.modes?.find(
-    (m) => m.mode_name === modeName,
-  );
+  const mode = config.mfes?.[mfe]?.modes?.find((m) => m.mode_name === modeName);
   return mode?.command ?? "npm start";
 }
 

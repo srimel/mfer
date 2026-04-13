@@ -380,7 +380,7 @@ groups:
   admin:
     - my-admin-panel
     - my-shared-components
-mfes:                                   # optional, per-MFE configuration
+mfes: # optional, per-MFE configuration
   my-main-app:
     modes:
       - mode_name: mock

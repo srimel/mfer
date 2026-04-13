@@ -18,11 +18,13 @@ npm run lint:fix       # Auto-fix linting issues
 ```
 
 Run a single test file:
+
 ```bash
 npx vitest run src/commands/__tests__/run.test.ts
 ```
 
 Manual testing workflow (after `npm run build`):
+
 ```bash
 npm uninstall -g mfer   # remove any published version
 npm install -g .        # install local build globally
@@ -55,12 +57,12 @@ Config is YAML stored at `~/.mfer/config.yaml`. Load it via `src/utils/config-ut
 ```yaml
 base_github_url: "https://github.com/username"
 mfe_directory: "/path/to/microfrontends"
-lib_directory: "/path/to/libs"   # optional
-libs: [lib1, lib2]               # optional
+lib_directory: "/path/to/libs" # optional
+libs: [lib1, lib2] # optional
 groups:
   all: [mfe1, mfe2]
   custom: [mfe1]
-mfes:                            # optional, per-MFE config
+mfes: # optional, per-MFE config
   mfe1:
     modes:
       - mode_name: mock
