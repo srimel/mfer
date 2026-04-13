@@ -52,26 +52,29 @@ export default myCommand;
 
 ### Configuration
 
-Config is YAML stored at `~/.mfer/config.yaml`. Load it via `src/utils/config-utils.ts` utilities (`loadConfig`, `configExists`, `warnOfMissingConfig`). Always check `configExists` before operating. Config shape:
+Config is TOML stored at `~/.mfer/config.toml`. Load it via `src/utils/config-utils.ts` utilities (`loadConfig`, `configExists`, `warnOfMissingConfig`). Always check `configExists` before operating. Config shape:
 
-```yaml
-base_github_url: "https://github.com/username"
-mfe_directory: "/path/to/microfrontends"
-lib_directory: "/path/to/libs" # optional
-libs: [lib1, lib2] # optional
-groups:
-  all: [mfe1, mfe2]
-  custom: [mfe1]
-mfes: # optional, per-MFE config
-  mfe1:
-    modes:
-      - mode_name: mock
-        command: npm run start:mocked
+```toml
+base_github_url = "https://github.com/username"
+mfe_directory = "/path/to/microfrontends"
+lib_directory = "/path/to/libs" # optional
+libs = ["lib1", "lib2"] # optional
+
+[groups]
+all = ["mfe1", "mfe2"]
+custom = ["mfe1"]
+
+# optional, per-MFE config
+[[mfes.mfe1.modes]]
+mode_name = "mock"
+command = "npm run start:mocked"
 ```
+
+Legacy YAML configs can be converted via `mfer config migrate` (reads `config.yaml`, writes `config.toml`).
 
 ### Utilities
 
-- `src/utils/config-utils.ts` — load/save/validate YAML config
+- `src/utils/config-utils.ts` — load/save/validate TOML config
 - `src/utils/command-utils.ts` — shared logic (running processes, filtering by group/selection)
 - `src/utils/lib-utils.ts` — library-specific helpers
 
