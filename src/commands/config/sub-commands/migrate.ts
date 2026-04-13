@@ -25,7 +25,9 @@ export const migrateConfigCommand = new Command("migrate")
     try {
       parsed = YAML.parse(fs.readFileSync(yamlConfigPath, "utf8"));
     } catch (error) {
-      console.log(`${chalk.red("Error")}: Failed to parse YAML config\n${error}`);
+      console.log(
+        `${chalk.red("Error")}: Failed to parse YAML config\n${error}`,
+      );
       return;
     }
 
@@ -51,7 +53,9 @@ export const migrateConfigCommand = new Command("migrate")
         stringifyToml(parsed as unknown as Record<string, unknown>),
       );
     } catch (error) {
-      console.log(`${chalk.red("Error")}: Failed to write TOML config\n${error}`);
+      console.log(
+        `${chalk.red("Error")}: Failed to write TOML config\n${error}`,
+      );
       return;
     }
 
