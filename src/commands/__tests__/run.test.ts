@@ -11,6 +11,12 @@ vi.mock("../../utils/config-utils.js", () => ({
       all: ["mfe1", "mfe2", "mfe3"],
       home: ["mfe1", "mfe2"],
       dashboard: ["mfe3"],
+      mocked: ["root-config", "mfe1"],
+    },
+    mfes: {
+      "root-config": {
+        modes: [{ mode_name: "mock", command: "npm run start:mocked" }],
+      },
     },
   },
   warnOfMissingConfig: vi.fn(),
@@ -229,6 +235,71 @@ describe("run command", () => {
       expect.stringContaining(
         "Error: --async can only be used with --command option",
       ),
+    );
+  });
+
+  it("should error when --mode and --command are used together", async () => {
+    await runCommand.parseAsync([
+      "run",
+      "home",
+      "--mode",
+      "mock",
+      "--command",
+      "npm ci",
+    ]);
+
+    expect(mockConsoleLog).toHaveBeenCalledWith(
+      expect.stringContaining(
+        "Error: --mode and --command cannot be used together",
+      ),
+    );
+  });
+
+  it("should run MFEs with their mode command when --mode matches, default otherwise", async () => {
+    const concurrently = (await import("concurrently")).default;
+
+    // "mocked" group contains ["root-config", "mfe1"]
+    // root-config has mock mode → npm run start:mocked
+    // mfe1 has no mock mode → npm start (default)
+    // Note: Commander strips argv[0] and argv[1], so group arg needs index 2+
+    await runCommand.parseAsync(["node", "mfer", "mocked", "--mode", "mock"]);
+
+    expect(concurrently).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          command: "npm run start:mocked",
+          name: "root-config",
+          cwd: path.join("/test/mfe", "root-config"),
+        }),
+        expect.objectContaining({
+          command: "npm start",
+          name: "mfe1",
+          cwd: path.join("/test/mfe", "mfe1"),
+        }),
+      ]),
+      expect.objectContaining({
+        prefix: "{name} |",
+        killOthersOn: ["failure", "success"],
+        restartTries: 0,
+      }),
+    );
+  });
+
+  it("should warn when --mode is given but no MFE in the group has that mode", async () => {
+    await runCommand.parseAsync(["run", "home", "--mode", "unknown-mode"]);
+
+    expect(mockConsoleLog).toHaveBeenCalledWith(
+      expect.stringContaining(
+        "Warning: no MFE in the selected group has a 'unknown-mode' mode defined",
+      ),
+    );
+  });
+
+  it("should show mode name in status message when --mode is used", async () => {
+    await runCommand.parseAsync(["node", "mfer", "mocked", "--mode", "mock"]);
+
+    expect(mockConsoleLog).toHaveBeenCalledWith(
+      expect.stringContaining("Running mode 'mock' on micro frontends in"),
     );
   });
 });
