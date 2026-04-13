@@ -34,9 +34,8 @@ export const legacyYamlConfigPath: string = path.join(
   ".mfer/config.yaml",
 );
 export const configExists: boolean = fs.existsSync(configPath);
-export const legacyYamlConfigExists: boolean = fs.existsSync(
-  legacyYamlConfigPath,
-);
+export const legacyYamlConfigExists: boolean =
+  fs.existsSync(legacyYamlConfigPath);
 export let currentConfig: MferConfig;
 
 /**
