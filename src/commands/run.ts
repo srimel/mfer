@@ -17,16 +17,16 @@ const runCommand = new Command("run")
   .argument(
     "[group_name]",
     "name of the group as specified in the configuration",
-    "all"
+    "all",
   )
   .option("-s, --select", "prompt to select which micro frontends to run")
   .option(
     "-c, --command <command>",
-    "custom command to run (default: npm start)"
+    "custom command to run (default: npm start)",
   )
   .option(
     "-a, --async",
-    "run custom command concurrently instead of sequentially (only works with --command option)"
+    "run custom command concurrently instead of sequentially (only works with --command option)",
   )
 
   .action(async (groupName, options) => {
@@ -50,7 +50,7 @@ const runCommand = new Command("run")
     if (options.async && !options.command) {
       const messagePrefix = chalk.red("Error");
       console.log(
-        `${messagePrefix}: --async can only be used with --command option`
+        `${messagePrefix}: --async can only be used with --command option`,
       );
       return;
     }
@@ -61,15 +61,15 @@ const runCommand = new Command("run")
       console.log(`${messagePrefix}: no group found with name '${groupName}'`);
       console.log(
         `Available groups: ${chalk.green(
-          Object.keys(currentConfig.groups).join(" ")
-        )}`
+          Object.keys(currentConfig.groups).join(" "),
+        )}`,
       );
       return;
     }
     if (!Array.isArray(group) || group.length === 0) {
       const messagePrefix = chalk.red("Error");
       console.log(
-        `${messagePrefix}: group '${groupName}' has no micro frontends defined.`
+        `${messagePrefix}: group '${groupName}' has no micro frontends defined.`,
       );
       return;
     }
@@ -94,8 +94,8 @@ const runCommand = new Command("run")
 
     console.log(
       chalk.green(
-        `Running ${commandText} on micro frontends in ${groupText}...`
-      )
+        `Running ${commandText} on micro frontends in ${groupText}...`,
+      ),
     );
 
     // If async execution is requested or default command is used
@@ -113,7 +113,7 @@ const runCommand = new Command("run")
 async function runSequentially(
   mfes: string[],
   command: string,
-  mfeDir: string
+  mfeDir: string,
 ): Promise<void> {
   for (const mfe of mfes) {
     const cwd = path.join(mfeDir, mfe);
@@ -136,12 +136,14 @@ async function runSequentially(
             console.error(chalk.red(`[${mfe}] Error: ${error.message}`));
             resolve({ exitCode: 1 });
           });
-        }
+        },
       );
 
       if (result.exitCode !== 0) {
         console.error(
-          chalk.red(`[${mfe}] Command failed with exit code ${result.exitCode}`)
+          chalk.red(
+            `[${mfe}] Command failed with exit code ${result.exitCode}`,
+          ),
         );
       }
     } catch (error) {
@@ -156,7 +158,7 @@ async function runSequentially(
 async function runConcurrently(
   mfes: string[],
   command: string,
-  mfeDir: string
+  mfeDir: string,
 ): Promise<void> {
   const commands = mfes.map((mfe) => ({
     command,
@@ -174,7 +176,7 @@ async function runConcurrently(
   // Handle graceful shutdown on Ctrl+C
   const handleSigint = () => {
     console.log(
-      chalk.yellow("\nReceived SIGINT. Stopping all micro frontends...")
+      chalk.yellow("\nReceived SIGINT. Stopping all micro frontends..."),
     );
     concurrentlyResult.commands.forEach((cmd) => {
       if (cmd && typeof cmd.kill === "function") {
@@ -196,14 +198,14 @@ async function runConcurrently(
           const cwd = fail.command?.cwd || "unknown";
           console.error(
             chalk.yellow(
-              `  MFE ${name} failed to start (cwd: ${cwd}) with exit code ${exitCode}`
-            )
+              `  MFE ${name} failed to start (cwd: ${cwd}) with exit code ${exitCode}`,
+            ),
           );
         });
       } else if (err && typeof err === "object" && "message" in err) {
         console.error((err as { message: string }).message);
       }
-    }
+    },
   );
 }
 

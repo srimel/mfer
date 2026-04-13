@@ -13,13 +13,13 @@ import fs from "fs";
  */
 export async function promptForMFESelection(
   groupName: string,
-  mfes: string[]
+  mfes: string[],
 ): Promise<string[]> {
   try {
     console.log(
       chalk.blue(
-        `Select micro frontends to operate on from group '${groupName}':`
-      )
+        `Select micro frontends to operate on from group '${groupName}':`,
+      ),
     );
     const selectedMFEs = await checkbox({
       message: "Choose which micro frontends to operate on:",
@@ -47,7 +47,7 @@ export async function promptForMFESelection(
  * @returns Promise<string[]> - Array of selected library names
  */
 export async function promptForLibrarySelection(
-  libs: string[]
+  libs: string[],
 ): Promise<string[]> {
   try {
     console.log(chalk.blue("Select libraries to operate on:"));
@@ -79,7 +79,7 @@ export async function promptForLibrarySelection(
  */
 export function validateGitRepositories(
   repos: string[],
-  baseDir: string
+  baseDir: string,
 ): {
   validRepos: string[];
   invalidRepos: { name: string; reason: string }[];
@@ -132,7 +132,7 @@ export async function runGitPullConcurrently(
   repos: string[],
   baseDir: string,
   contextName: string,
-  options: { select?: boolean }
+  options: { select?: boolean },
 ): Promise<void> {
   const commands = repos.map((repo) => ({
     command: "git pull",
@@ -155,7 +155,7 @@ export async function runGitPullConcurrently(
   // Graceful shutdown on Ctrl+C
   const handleSigint = () => {
     console.log(
-      chalk.yellow("\nReceived SIGINT. Stopping all git pull operations...")
+      chalk.yellow("\nReceived SIGINT. Stopping all git pull operations..."),
     );
     concurrentlyResult.commands.forEach((cmd) => {
       if (cmd && typeof cmd.kill === "function") {
@@ -172,7 +172,7 @@ export async function runGitPullConcurrently(
         ? `selected repositories from ${contextName}`
         : `all repositories in ${contextName}`;
       console.log(
-        chalk.green(`\nSuccessfully pulled latest changes for ${successText}`)
+        chalk.green(`\nSuccessfully pulled latest changes for ${successText}`),
       );
     },
     (err: unknown) => {
@@ -184,14 +184,14 @@ export async function runGitPullConcurrently(
           const cwd = fail.command?.cwd || "unknown";
           console.error(
             chalk.yellow(
-              `  Repository ${name} failed to pull (cwd: ${cwd}) with exit code ${exitCode}`
-            )
+              `  Repository ${name} failed to pull (cwd: ${cwd}) with exit code ${exitCode}`,
+            ),
           );
         });
       } else if (err && typeof err === "object" && "message" in err) {
         console.error((err as { message: string }).message);
       }
-    }
+    },
   );
 }
 
@@ -207,7 +207,7 @@ export async function runNpmInstallSequentially(
   items: string[],
   baseDir: string,
   contextName: string,
-  options: { select?: boolean }
+  options: { select?: boolean },
 ): Promise<void> {
   let hadError = false;
 
@@ -240,12 +240,12 @@ export async function runNpmInstallSequentially(
       hadError = true;
       console.error(
         chalk.red(
-          `  ${item} failed to install (cwd: ${cwd}) with exit code ${result.status}`
-        )
+          `  ${item} failed to install (cwd: ${cwd}) with exit code ${result.status}`,
+        ),
       );
     } else {
       console.log(
-        chalk.green(`  ${item} installed successfully (cwd: ${cwd})\n`)
+        chalk.green(`  ${item} installed successfully (cwd: ${cwd})\n`),
       );
     }
   }

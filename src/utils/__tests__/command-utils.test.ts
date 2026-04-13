@@ -45,7 +45,7 @@ describe("command-utils", () => {
       const result = await promptForMFESelection(groupName, mfes);
 
       expect(mockConsoleLog).toHaveBeenCalledWith(
-        `Select micro frontends to operate on from group '${groupName}':`
+        `Select micro frontends to operate on from group '${groupName}':`,
       );
       expect(mockCheckbox).toHaveBeenCalledWith({
         message: "Choose which micro frontends to operate on:",
@@ -70,9 +70,9 @@ describe("command-utils", () => {
       let validateFunction: (arr: string[]) => boolean | string;
       mockCheckbox.mockImplementation((options) => {
         validateFunction = options.validate as unknown as (
-          arr: string[]
+          arr: string[],
         ) => boolean | string;
-        return Promise.resolve([]) as any;
+        return Promise.resolve([]) as Promise<string[]>;
       });
 
       await promptForMFESelection(groupName, mfes);
@@ -122,11 +122,11 @@ describe("command-utils", () => {
       mockCheckbox.mockRejectedValue(otherError);
 
       await expect(promptForMFESelection(groupName, mfes)).rejects.toThrow(
-        "Some other error"
+        "Some other error",
       );
 
       expect(mockConsoleLog).not.toHaveBeenCalledWith(
-        "\nReceived SIGINT. Stopping..."
+        "\nReceived SIGINT. Stopping...",
       );
       expect(mockExit).not.toHaveBeenCalled();
     });
@@ -182,11 +182,11 @@ describe("command-utils", () => {
       mockCheckbox.mockRejectedValue(errorWithoutMessage);
 
       await expect(promptForMFESelection(groupName, mfes)).rejects.toEqual(
-        errorWithoutMessage
+        errorWithoutMessage,
       );
 
       expect(mockConsoleLog).not.toHaveBeenCalledWith(
-        "\nReceived SIGINT. Stopping..."
+        "\nReceived SIGINT. Stopping...",
       );
       expect(mockExit).not.toHaveBeenCalled();
     });
@@ -202,11 +202,11 @@ describe("command-utils", () => {
       mockCheckbox.mockRejectedValue(stringError);
 
       await expect(promptForMFESelection(groupName, mfes)).rejects.toBe(
-        stringError
+        stringError,
       );
 
       expect(mockConsoleLog).not.toHaveBeenCalledWith(
-        "\nReceived SIGINT. Stopping..."
+        "\nReceived SIGINT. Stopping...",
       );
       expect(mockExit).not.toHaveBeenCalled();
     });

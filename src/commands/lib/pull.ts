@@ -15,7 +15,7 @@ const pullCommand = new Command("pull")
   .description("pull latest changes from library git repositories")
   .argument(
     "[lib-name]",
-    "name of the library to pull from (pulls all if not specified)"
+    "name of the library to pull from (pulls all if not specified)",
   )
   .option("-s, --select", "prompt to select which libraries to pull")
   .action(async (libName, options) => {
@@ -26,10 +26,10 @@ const pullCommand = new Command("pull")
 
     if (!currentConfig.lib_directory || !currentConfig.libs) {
       console.log(
-        chalk.red("Error: Library configuration not found in config file.")
+        chalk.red("Error: Library configuration not found in config file."),
       );
       console.log(
-        chalk.yellow("Please run 'mfer init' to configure library settings.")
+        chalk.yellow("Please run 'mfer init' to configure library settings."),
       );
       return;
     }
@@ -45,10 +45,10 @@ const pullCommand = new Command("pull")
       // Check if the specified library exists
       if (!currentConfig.libs.includes(libName)) {
         console.log(
-          chalk.red(`Error: Library '${libName}' not found in configuration.`)
+          chalk.red(`Error: Library '${libName}' not found in configuration.`),
         );
         console.log(
-          `Available libraries: ${chalk.green(currentConfig.libs.join(" "))}`
+          `Available libraries: ${chalk.green(currentConfig.libs.join(" "))}`,
         );
         return;
       }
@@ -64,7 +64,7 @@ const pullCommand = new Command("pull")
 
     const { validRepos, invalidRepos } = validateGitRepositories(
       targetLibs,
-      libDir
+      libDir,
     );
 
     // Report invalid repositories
@@ -80,13 +80,13 @@ const pullCommand = new Command("pull")
       console.log(chalk.red("No valid git repositories found to pull from."));
       if (
         invalidRepos.some((repo) =>
-          repo.reason.includes("Directory does not exist")
+          repo.reason.includes("Directory does not exist"),
         )
       ) {
         console.log(
           chalk.blue(
-            "\nTip: Make sure your libraries are cloned to the configured directory."
-          )
+            "\nTip: Make sure your libraries are cloned to the configured directory.",
+          ),
         );
       }
       return;

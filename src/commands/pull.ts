@@ -16,7 +16,7 @@ const pullCommand = new Command("pull")
   .argument(
     "[group_name]",
     "name of the group as specified in the configuration",
-    "all"
+    "all",
   )
   .option("-s, --select", "prompt to select which repositories to pull")
   .action(async (groupName, options) => {
@@ -31,15 +31,15 @@ const pullCommand = new Command("pull")
       console.log(`${messagePrefix}: no group found with name '${groupName}'`);
       console.log(
         `Available groups: ${chalk.green(
-          Object.keys(currentConfig.groups).join(" ")
-        )}`
+          Object.keys(currentConfig.groups).join(" "),
+        )}`,
       );
       return;
     }
     if (!Array.isArray(group) || group.length === 0) {
       const messagePrefix = chalk.red("Error");
       console.log(
-        `${messagePrefix}: group '${groupName}' has no repositories defined.`
+        `${messagePrefix}: group '${groupName}' has no repositories defined.`,
       );
       return;
     }
@@ -48,7 +48,7 @@ const pullCommand = new Command("pull")
 
     // Validate repositories before running git pull
     console.log(
-      chalk.blue(`Validating repositories in group: ${groupName}...`)
+      chalk.blue(`Validating repositories in group: ${groupName}...`),
     );
 
     const { validRepos, invalidRepos } = validateGitRepositories(group, mfeDir);
@@ -66,13 +66,13 @@ const pullCommand = new Command("pull")
       console.log(chalk.red("No valid git repositories found to pull from."));
       if (
         invalidRepos.some((repo) =>
-          repo.reason.includes("Directory does not exist")
+          repo.reason.includes("Directory does not exist"),
         )
       ) {
         console.log(
           chalk.blue(
-            "\nTip: Run 'mfer init' to clone repositories that don't exist yet."
-          )
+            "\nTip: Run 'mfer init' to clone repositories that don't exist yet.",
+          ),
         );
       }
       return;
