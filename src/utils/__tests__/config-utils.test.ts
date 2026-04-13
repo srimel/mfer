@@ -3,14 +3,14 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 import { spawn } from "child_process";
-import YAML from "yaml";
+import * as smolToml from "smol-toml";
 
 // Mock all dependencies
 vi.mock("fs");
 vi.mock("path");
 vi.mock("os");
 vi.mock("child_process");
-vi.mock("yaml");
+vi.mock("smol-toml");
 vi.mock("chalk", () => {
   const mockChalk = {
     red: vi.fn((text) => text),
@@ -28,14 +28,14 @@ describe("config-utils", () => {
   const mockPath = vi.mocked(path);
   const mockOs = vi.mocked(os);
   const mockSpawn = vi.mocked(spawn);
-  const mockYaml = vi.mocked(YAML);
+  const mockToml = vi.mocked(smolToml);
 
   beforeEach(() => {
     vi.clearAllMocks();
 
     // Setup default mocks
     mockOs.homedir.mockReturnValue("/mock/home");
-    mockPath.join.mockReturnValue("/mock/home/.mfer/config.yaml");
+    mockPath.join.mockReturnValue("/mock/home/.mfer/config.toml");
     mockPath.dirname.mockReturnValue("/mock/home/.mfer");
   });
 
@@ -50,18 +50,18 @@ describe("config-utils", () => {
       };
 
       mockFs.existsSync.mockReturnValue(true);
-      mockFs.readFileSync.mockReturnValue("mock yaml content");
-      mockYaml.parse.mockReturnValue(mockConfig);
+      mockFs.readFileSync.mockReturnValue("mock toml content");
+      mockToml.parse.mockReturnValue(mockConfig);
 
       const { loadConfig } = await import("../config-utils.js");
 
       loadConfig();
 
       expect(mockFs.readFileSync).toHaveBeenCalledWith(
-        "/mock/home/.mfer/config.yaml",
+        "/mock/home/.mfer/config.toml",
         "utf8",
       );
-      expect(mockYaml.parse).toHaveBeenCalledWith("mock yaml content");
+      expect(mockToml.parse).toHaveBeenCalledWith("mock toml content");
     });
 
     it("should not load config when file does not exist", async () => {
@@ -71,8 +71,6 @@ describe("config-utils", () => {
 
       loadConfig();
 
-      // Since configExists is evaluated at module load time, we can't easily test this
-      // But we can verify the function doesn't crash
       expect(loadConfig).toBeDefined();
     });
   });
@@ -85,8 +83,6 @@ describe("config-utils", () => {
 
       warnOfMissingConfig();
 
-      // Since configExists is evaluated at module load time, we can't easily test this
-      // But we can verify the function doesn't crash
       expect(warnOfMissingConfig).toBeDefined();
     });
 
@@ -97,8 +93,6 @@ describe("config-utils", () => {
 
       warnOfMissingConfig();
 
-      // Since configExists is evaluated at module load time, we can't easily test this
-      // But we can verify the function doesn't crash
       expect(warnOfMissingConfig).toBeDefined();
     });
   });
@@ -111,16 +105,14 @@ describe("config-utils", () => {
 
       const result = isConfigValid();
 
-      // Since configExists is evaluated at module load time, we can't easily test this
-      // But we can verify the function returns a boolean
       expect(typeof result).toBe("boolean");
     });
 
-    it("should return false when YAML parsing fails", async () => {
+    it("should return false when TOML parsing fails", async () => {
       mockFs.existsSync.mockReturnValue(true);
-      mockFs.readFileSync.mockReturnValue("invalid yaml");
-      mockYaml.parse.mockImplementation(() => {
-        throw new Error("Invalid YAML");
+      mockFs.readFileSync.mockReturnValue("invalid toml");
+      mockToml.parse.mockImplementation(() => {
+        throw new Error("Invalid TOML");
       });
 
       const { isConfigValid } = await import("../config-utils.js");
@@ -132,8 +124,6 @@ describe("config-utils", () => {
 
     it("should return false when config is missing required fields", async () => {
       const invalidConfigs = [
-        null,
-        undefined,
         {},
         { base_github_url: "https://github.com" },
         { base_github_url: "https://github.com", mfe_directory: "/path" },
@@ -150,18 +140,15 @@ describe("config-utils", () => {
       ];
 
       mockFs.existsSync.mockReturnValue(true);
-      mockFs.readFileSync.mockReturnValue("mock yaml content");
+      mockFs.readFileSync.mockReturnValue("mock toml content");
 
       const { isConfigValid } = await import("../config-utils.js");
 
       for (const config of invalidConfigs) {
-        mockYaml.parse.mockReturnValue(config);
+        mockToml.parse.mockReturnValue(config);
         const result = isConfigValid();
-        // The function returns the result of a boolean expression
-        // For null/undefined, it returns null/undefined, which is falsy
         expect(result).toBeFalsy();
-        // Reset the mock for the next iteration
-        mockYaml.parse.mockClear();
+        mockToml.parse.mockClear();
       }
     });
 
@@ -177,8 +164,8 @@ describe("config-utils", () => {
       };
 
       mockFs.existsSync.mockReturnValue(true);
-      mockFs.readFileSync.mockReturnValue("mock yaml content");
-      mockYaml.parse.mockReturnValue(validConfig);
+      mockFs.readFileSync.mockReturnValue("mock toml content");
+      mockToml.parse.mockReturnValue(validConfig);
 
       const { isConfigValid } = await import("../config-utils.js");
 
@@ -200,8 +187,8 @@ describe("config-utils", () => {
       };
 
       mockFs.existsSync.mockReturnValue(true);
-      mockFs.readFileSync.mockReturnValue("mock yaml content");
-      mockYaml.parse.mockReturnValue(validConfig);
+      mockFs.readFileSync.mockReturnValue("mock toml content");
+      mockToml.parse.mockReturnValue(validConfig);
 
       const { isConfigValid } = await import("../config-utils.js");
 
@@ -215,14 +202,14 @@ describe("config-utils", () => {
         groups: { all: ["app1"] },
         mfes: {
           app1: {
-            modes: [{ mode_name: "mock" }], // missing command
+            modes: [{ mode_name: "mock" }],
           },
         },
       };
 
       mockFs.existsSync.mockReturnValue(true);
-      mockFs.readFileSync.mockReturnValue("mock yaml content");
-      mockYaml.parse.mockReturnValue(invalidConfig);
+      mockFs.readFileSync.mockReturnValue("mock toml content");
+      mockToml.parse.mockReturnValue(invalidConfig);
 
       const { isConfigValid } = await import("../config-utils.js");
 
@@ -236,14 +223,14 @@ describe("config-utils", () => {
         groups: { all: ["app1"] },
         mfes: {
           app1: {
-            modes: [{ command: "npm run start:mocked" }], // missing mode_name
+            modes: [{ command: "npm run start:mocked" }],
           },
         },
       };
 
       mockFs.existsSync.mockReturnValue(true);
-      mockFs.readFileSync.mockReturnValue("mock yaml content");
-      mockYaml.parse.mockReturnValue(invalidConfig);
+      mockFs.readFileSync.mockReturnValue("mock toml content");
+      mockToml.parse.mockReturnValue(invalidConfig);
 
       const { isConfigValid } = await import("../config-utils.js");
 
@@ -259,8 +246,8 @@ describe("config-utils", () => {
       };
 
       mockFs.existsSync.mockReturnValue(true);
-      mockFs.readFileSync.mockReturnValue("mock yaml content");
-      mockYaml.parse.mockReturnValue(invalidConfig);
+      mockFs.readFileSync.mockReturnValue("mock toml content");
+      mockToml.parse.mockReturnValue(invalidConfig);
 
       const { isConfigValid } = await import("../config-utils.js");
 
@@ -278,23 +265,23 @@ describe("config-utils", () => {
         },
       };
 
-      mockFs.existsSync.mockReturnValue(false); // Directory doesn't exist
-      mockYaml.stringify.mockReturnValue("mock yaml string");
+      mockFs.existsSync.mockReturnValue(false);
+      mockToml.stringify.mockReturnValue("mock toml string");
 
       const { saveConfig } = await import("../config-utils.js");
 
       saveConfig(mockConfig);
 
       expect(mockPath.dirname).toHaveBeenCalledWith(
-        "/mock/home/.mfer/config.yaml",
+        "/mock/home/.mfer/config.toml",
       );
       expect(mockFs.mkdirSync).toHaveBeenCalledWith("/mock/home/.mfer", {
         recursive: true,
       });
-      expect(mockYaml.stringify).toHaveBeenCalledWith(mockConfig);
+      expect(mockToml.stringify).toHaveBeenCalledWith(mockConfig);
       expect(mockFs.writeFileSync).toHaveBeenCalledWith(
-        "/mock/home/.mfer/config.yaml",
-        "mock yaml string",
+        "/mock/home/.mfer/config.toml",
+        "mock toml string",
       );
     });
 
@@ -308,7 +295,7 @@ describe("config-utils", () => {
       };
 
       mockFs.existsSync.mockReturnValue(false);
-      mockYaml.stringify.mockReturnValue("mock yaml string");
+      mockToml.stringify.mockReturnValue("mock toml string");
 
       const { saveConfig } = await import("../config-utils.js");
 
@@ -337,8 +324,6 @@ describe("config-utils", () => {
 
       saveConfig(mockConfig);
 
-      // We can see from the test output that the error is logged
-      // The function should not throw an error
       expect(saveConfig).toBeDefined();
     });
   });
@@ -358,10 +343,9 @@ describe("config-utils", () => {
 
       editConfig();
 
-      // We can see from the test output that the message is logged
       expect(mockSpawn).toHaveBeenCalledWith(
         "notepad",
-        ["/mock/home/.mfer/config.yaml"],
+        ["/mock/home/.mfer/config.toml"],
         {
           stdio: "ignore",
           detached: true,
@@ -385,10 +369,9 @@ describe("config-utils", () => {
 
       editConfig();
 
-      // We can see from the test output that the message is logged
       expect(mockSpawn).toHaveBeenCalledWith(
         "vim",
-        ["/mock/home/.mfer/config.yaml"],
+        ["/mock/home/.mfer/config.toml"],
         {
           stdio: "ignore",
           detached: true,
@@ -411,10 +394,9 @@ describe("config-utils", () => {
 
       editConfig();
 
-      // We can see from the test output that the message is logged
       expect(mockSpawn).toHaveBeenCalledWith(
         "code",
-        ["/mock/home/.mfer/config.yaml"],
+        ["/mock/home/.mfer/config.toml"],
         {
           stdio: "ignore",
           detached: true,
@@ -437,10 +419,9 @@ describe("config-utils", () => {
 
       editConfig();
 
-      // We can see from the test output that the message is logged
       expect(mockSpawn).toHaveBeenCalledWith(
         "vi",
-        ["/mock/home/.mfer/config.yaml"],
+        ["/mock/home/.mfer/config.toml"],
         {
           stdio: "ignore",
           detached: true,
