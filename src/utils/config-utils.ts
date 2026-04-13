@@ -29,7 +29,14 @@ export interface MferConfig {
 }
 
 export const configPath: string = path.join(os.homedir(), ".mfer/config.toml");
+export const legacyYamlConfigPath: string = path.join(
+  os.homedir(),
+  ".mfer/config.yaml",
+);
 export const configExists: boolean = fs.existsSync(configPath);
+export const legacyYamlConfigExists: boolean = fs.existsSync(
+  legacyYamlConfigPath,
+);
 export let currentConfig: MferConfig;
 
 /**
@@ -47,6 +54,16 @@ export const loadConfig = (): MferConfig | undefined => {
 
 export const warnOfMissingConfig = () => {
   if (!configExists) {
+    if (legacyYamlConfigExists) {
+      console.log(
+        `${chalk.red(
+          "Error",
+        )}: No TOML configuration file detected, but a legacy YAML config was found at ${legacyYamlConfigPath}\n       Please run ${chalk.blue.bold(
+          "mfer config migrate",
+        )} to convert it to TOML`,
+      );
+      return;
+    }
     console.log(
       `${chalk.red(
         "Error",
@@ -57,6 +74,51 @@ export const warnOfMissingConfig = () => {
   }
 };
 
+export const isParsedConfigValid = (parsed: unknown): boolean => {
+  const config = parsed as Partial<MferConfig> & {
+    mfes?: Record<string, unknown>;
+  };
+
+  const hasRequiredFields = Boolean(
+    config &&
+      typeof config === "object" &&
+      config.base_github_url &&
+      config.mfe_directory &&
+      config.groups &&
+      typeof config.groups === "object" &&
+      config.groups.all &&
+      Array.isArray(config.groups.all) &&
+      config.groups.all.length > 0,
+  );
+
+  if (!hasRequiredFields) return false;
+
+  if (config.lib_directory && (!config.libs || !Array.isArray(config.libs))) {
+    return false;
+  }
+
+  if (config.mfes && typeof config.mfes === "object") {
+    for (const mfeConfig of Object.values(config.mfes)) {
+      if (mfeConfig && (mfeConfig as { modes?: unknown }).modes !== undefined) {
+        const modes = (mfeConfig as { modes: unknown }).modes;
+        if (!Array.isArray(modes)) return false;
+        for (const mode of modes) {
+          if (
+            !mode ||
+            typeof mode !== "object" ||
+            !mode.mode_name ||
+            !mode.command
+          ) {
+            return false;
+          }
+        }
+      }
+    }
+  }
+
+  return true;
+};
+
 export const isConfigValid = (): boolean => {
   if (!configExists) {
     return false;
@@ -64,54 +126,8 @@ export const isConfigValid = (): boolean => {
 
   try {
     const configFile = fs.readFileSync(configPath, "utf8");
-    const config = parseToml(configFile) as Partial<MferConfig> & {
-      mfes?: Record<string, unknown>;
-    };
-
-    // Check if config has required fields and they're not empty
-    const hasRequiredFields = Boolean(
-      config &&
-        typeof config === "object" &&
-        config.base_github_url &&
-        config.mfe_directory &&
-        config.groups &&
-        typeof config.groups === "object" &&
-        config.groups.all &&
-        Array.isArray(config.groups.all) &&
-        config.groups.all.length > 0,
-    );
-
-    // If lib_directory is provided, libs should also be provided
-    if (config.lib_directory && (!config.libs || !Array.isArray(config.libs))) {
-      return false;
-    }
-
-    // If mfes is provided, validate each entry's modes have required fields
-    if (config.mfes && typeof config.mfes === "object") {
-      for (const mfeConfig of Object.values(config.mfes)) {
-        if (
-          mfeConfig &&
-          (mfeConfig as { modes?: unknown }).modes !== undefined
-        ) {
-          const modes = (mfeConfig as { modes: unknown }).modes;
-          if (!Array.isArray(modes)) return false;
-          for (const mode of modes) {
-            if (
-              !mode ||
-              typeof mode !== "object" ||
-              !mode.mode_name ||
-              !mode.command
-            ) {
-              return false;
-            }
-          }
-        }
-      }
-    }
-
-    return hasRequiredFields;
+    return isParsedConfigValid(parseToml(configFile));
   } catch {
-    // If parsing fails or any other error, config is invalid
     return false;
   }
 };

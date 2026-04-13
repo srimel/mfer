@@ -6,7 +6,10 @@ import chalk from "chalk";
 import YAML from "yaml";
 import { stringify as stringifyToml } from "smol-toml";
 import { confirm } from "@inquirer/prompts";
-import { MferConfig } from "../../../utils/config-utils.js";
+import {
+  MferConfig,
+  isParsedConfigValid,
+} from "../../../utils/config-utils.js";
 
 const yamlConfigPath = path.join(os.homedir(), ".mfer/config.yaml");
 const tomlConfigPath = path.join(os.homedir(), ".mfer/config.toml");
@@ -36,13 +39,29 @@ export const migrateConfigCommand = new Command("migrate")
       return;
     }
 
+    if (!isParsedConfigValid(parsed)) {
+      console.log(
+        `${chalk.red(
+          "Error",
+        )}: YAML config is missing required fields or is structurally invalid. Migration aborted.`,
+      );
+      return;
+    }
+
     if (fs.existsSync(tomlConfigPath)) {
-      const overwrite = await confirm({
-        message: `${tomlConfigPath} already exists. Overwrite?`,
-        default: false,
-      });
-      if (!overwrite) {
-        console.log(chalk.yellow("Migration cancelled."));
+      try {
+        const overwrite = await confirm({
+          message: `${tomlConfigPath} already exists. Overwrite?`,
+          default: false,
+        });
+        if (!overwrite) {
+          console.log(chalk.yellow("Migration cancelled."));
+          return;
+        }
+      } catch (error) {
+        console.log(
+          `${chalk.red("Error")}: Unable to prompt for overwrite\n${error}`,
+        );
         return;
       }
     }
@@ -61,10 +80,20 @@ export const migrateConfigCommand = new Command("migrate")
 
     console.log(chalk.green(`Migrated config written to ${tomlConfigPath}`));
 
-    const removeOld = await confirm({
-      message: `Delete the legacy ${yamlConfigPath}?`,
-      default: false,
-    });
+    let removeOld = false;
+    try {
+      removeOld = await confirm({
+        message: `Delete the legacy ${yamlConfigPath}?`,
+        default: false,
+      });
+    } catch (error) {
+      console.log(
+        `${chalk.yellow(
+          "Warning",
+        )}: Unable to prompt for legacy deletion — leaving legacy config in place\n${error}`,
+      );
+      return;
+    }
     if (removeOld) {
       fs.unlinkSync(yamlConfigPath);
       console.log(chalk.green(`Removed ${yamlConfigPath}`));
