@@ -5,6 +5,15 @@ import YAML from "yaml";
 import chalk from "chalk";
 import { spawn } from "child_process";
 
+export interface MfeMode {
+  mode_name: string;
+  command: string;
+}
+
+export interface MfeConfig {
+  modes?: MfeMode[];
+}
+
 export interface MferConfig {
   base_github_url: string;
   mfe_directory: string;
@@ -13,6 +22,9 @@ export interface MferConfig {
   groups: {
     all: string[];
     [groupname: string]: string[];
+  };
+  mfes?: {
+    [mfeName: string]: MfeConfig;
   };
 }
 
