@@ -4,6 +4,28 @@ import { spawnSync } from "child_process";
 import concurrently from "concurrently";
 import path from "path";
 import fs from "fs";
+import type { MferConfig } from "./config-utils.js";
+
+/**
+ * Resolves the run command for a given MFE based on an optional mode name.
+ * Returns the command defined for the mode in the MFE's config, or falls back
+ * to 'npm start' if no mode is specified or the MFE has no matching mode.
+ * @param mfe - The micro frontend name
+ * @param modeName - Optional mode name to look up
+ * @param config - The loaded mfer configuration
+ * @returns The command string to run for this MFE
+ */
+export function resolveRunCommand(
+  mfe: string,
+  modeName: string | undefined,
+  config: MferConfig,
+): string {
+  if (!modeName) return "npm start";
+  const mode = config.mfes?.[mfe]?.modes?.find(
+    (m) => m.mode_name === modeName,
+  );
+  return mode?.command ?? "npm start";
+}
 
 /**
  * Prompts the user to select which micro frontends to operate on from a given group.
