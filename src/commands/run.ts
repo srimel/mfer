@@ -7,10 +7,18 @@ import {
 import concurrently from "concurrently";
 import chalk from "chalk";
 import path from "path";
-import { promptForMFESelection } from "../utils/command-utils.js";
+import {
+  promptForMFESelection,
+  resolveRunCommand,
+} from "../utils/command-utils.js";
 import { spawn } from "child_process";
 
 const DEFAULT_RUN_COMMAND = "npm start";
+
+interface MfeCommand {
+  mfe: string;
+  command: string;
+}
 
 const runCommand = new Command("run")
   .description("run micro-frontend applications")
@@ -28,6 +36,7 @@ const runCommand = new Command("run")
     "-a, --async",
     "run custom command concurrently instead of sequentially (only works with --command option)",
   )
+  .option("-m, --mode <mode_name>", "run MFEs using a named mode from config")
 
   .action(async (groupName, options) => {
     if (!configExists) {
@@ -51,6 +60,15 @@ const runCommand = new Command("run")
       const messagePrefix = chalk.red("Error");
       console.log(
         `${messagePrefix}: --async can only be used with --command option`,
+      );
+      return;
+    }
+
+    // --mode and --command are mutually exclusive
+    if (options.mode && options.command) {
+      const messagePrefix = chalk.red("Error");
+      console.log(
+        `${messagePrefix}: --mode and --command cannot be used together`,
       );
       return;
     }
@@ -81,16 +99,41 @@ const runCommand = new Command("run")
       selectedMFEs = await promptForMFESelection(groupName, group);
     }
 
+    // Warn if --mode was given but no MFE in the group has that mode defined
+    if (options.mode) {
+      const hasAnyMfeWithMode = selectedMFEs.some((mfe) =>
+        currentConfig.mfes?.[mfe]?.modes?.some(
+          (m) => m.mode_name === options.mode,
+        ),
+      );
+      if (!hasAnyMfeWithMode) {
+        console.log(
+          chalk.yellow(
+            `Warning: no MFE in the selected group has a '${options.mode}' mode defined. All MFEs will use the default command.`,
+          ),
+        );
+      }
+    }
+
     const mfeDir = currentConfig.mfe_directory;
-    const commandToRun = options.command || DEFAULT_RUN_COMMAND;
     const isAsync = options.async && options.command;
+
+    // Build per-MFE command list
+    const mfeCommands: MfeCommand[] = selectedMFEs.map((mfe) => ({
+      mfe,
+      command: options.command
+        ? options.command
+        : resolveRunCommand(mfe, options.mode, currentConfig),
+    }));
 
     const groupText = options.select
       ? `selected MFEs from group '${groupName}'`
       : `group '${groupName}'`;
     const commandText = options.command
-      ? `custom command '${commandToRun}'`
-      : "default command";
+      ? `custom command '${options.command}'`
+      : options.mode
+        ? `mode '${options.mode}'`
+        : "default command";
 
     console.log(
       chalk.green(
@@ -98,12 +141,12 @@ const runCommand = new Command("run")
       ),
     );
 
-    // If async execution is requested or default command is used
+    // If async execution is requested or no custom command is used (default/mode)
     if (isAsync || !options.command) {
-      await runConcurrently(selectedMFEs, commandToRun, mfeDir);
+      await runConcurrently(mfeCommands, mfeDir);
     } else {
       // Use sequential execution for custom commands (default behavior)
-      await runSequentially(selectedMFEs, commandToRun, mfeDir);
+      await runSequentially(mfeCommands, mfeDir);
     }
   });
 
@@ -111,11 +154,10 @@ const runCommand = new Command("run")
  * Run commands sequentially across micro frontends
  */
 async function runSequentially(
-  mfes: string[],
-  command: string,
+  mfeCommands: MfeCommand[],
   mfeDir: string,
 ): Promise<void> {
-  for (const mfe of mfes) {
+  for (const { mfe, command } of mfeCommands) {
     const cwd = path.join(mfeDir, mfe);
     console.log(chalk.blue(`\n[${mfe}] Running: ${command}`));
 
@@ -156,11 +198,10 @@ async function runSequentially(
  * Run commands concurrently across micro frontends
  */
 async function runConcurrently(
-  mfes: string[],
-  command: string,
+  mfeCommands: MfeCommand[],
   mfeDir: string,
 ): Promise<void> {
-  const commands = mfes.map((mfe) => ({
+  const commands = mfeCommands.map(({ mfe, command }) => ({
     command,
     name: mfe,
     cwd: path.join(mfeDir, mfe),
