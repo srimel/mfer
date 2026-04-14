@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
+import { fileURLToPath } from "url";
 import chalk from "chalk";
 import { spawnSync } from "child_process";
 
@@ -15,7 +16,7 @@ const NOTIFIED_VERSION_FILE = path.join(
  */
 export function getInstalledVersion(): string {
   const packageJsonPath = path.join(
-    path.dirname(new URL(import.meta.url).pathname),
+    path.dirname(fileURLToPath(import.meta.url)),
     "../../package.json",
   );
   try {
