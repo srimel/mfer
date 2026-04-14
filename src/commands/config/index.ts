@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import { listConfigCommand } from "./sub-commands/list-config.js";
 import { editConfigCommand } from "./sub-commands/edit-config.js";
+import { migrateConfigCommand } from "./sub-commands/migrate.js";
 
 /* TODO - support adding / modifying a group
 
@@ -15,5 +16,6 @@ const configCommand = new Command("config").description(
 
 configCommand.addCommand(listConfigCommand);
 configCommand.addCommand(editConfigCommand);
+configCommand.addCommand(migrateConfigCommand);
 
 export default configCommand;

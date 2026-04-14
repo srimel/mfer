@@ -24,7 +24,7 @@ A powerful CLI tool designed to simplify the management and execution of multipl
 - **Concurrent Execution**: Run multiple micro frontends simultaneously with organized output
 - **Group Management**: Organize micro frontends into logical groups for selective execution
 - **Git Integration**: Pull latest changes from all repositories with a single command
-- **Smart Configuration**: Interactive setup wizard with YAML-based configuration
+- **Smart Configuration**: Interactive setup wizard with TOML-based configuration
 - **Cross-Platform**: Works on Windows, macOS, and Linux
 - **Graceful Shutdown**: Clean termination of all processes with Ctrl+C
 
@@ -359,33 +359,26 @@ mfer lib install my-design-system --select # Select libraries from specific libr
 
 ## ⚙️ Configuration
 
-mfer uses a YAML configuration file located at `~/.mfer/config.yaml`. Here's an example structure:
+mfer uses a TOML configuration file located at `~/.mfer/config.toml`. Here's an example structure:
 
-```yaml
-base_github_url: "https://github.com/your-username"
-mfe_directory: "/path/to/your/micro-frontends"
-lib_directory: "/path/to/your/internal-libs"
-libs:
-  - my-shared-utils
-  - my-design-system
-  - my-common-components
-groups:
-  all:
-    - my-main-app
-    - my-admin-panel
-    - my-shared-components
-  main:
-    - my-main-app
-    - my-shared-components
-  admin:
-    - my-admin-panel
-    - my-shared-components
-mfes: # optional, per-MFE configuration
-  my-main-app:
-    modes:
-      - mode_name: mock
-        command: npm run start:mocked
+```toml
+base_github_url = "https://github.com/your-username"
+mfe_directory = "/path/to/your/micro-frontends"
+lib_directory = "/path/to/your/internal-libs"
+libs = ["my-shared-utils", "my-design-system", "my-common-components"]
+
+[groups]
+all = ["my-main-app", "my-admin-panel", "my-shared-components"]
+main = ["my-main-app", "my-shared-components"]
+admin = ["my-admin-panel", "my-shared-components"]
+
+# optional, per-MFE configuration
+[[mfes.my-main-app.modes]]
+mode_name = "mock"
+command = "npm run start:mocked"
 ```
+
+> **Migrating from v3.x?** v4.0.0 is a breaking change: YAML config is no longer supported. Run `mfer config migrate` to convert your existing `~/.mfer/config.yaml` to TOML automatically.
 
 ### Configuration Options
 
@@ -407,17 +400,13 @@ Run modes let individual MFEs use a different start command while the rest of th
 
 **Config example** — `root-config` runs with a mocked API, everything else runs normally:
 
-```yaml
-groups:
-  all:
-    - root-config
-    - mfe-nav
-    - mfe-dashboard
-mfes:
-  root-config:
-    modes:
-      - mode_name: mock
-        command: npm run start:mocked
+```toml
+[groups]
+all = ["root-config", "mfe-nav", "mfe-dashboard"]
+
+[[mfes.root-config.modes]]
+mode_name = "mock"
+command = "npm run start:mocked"
 ```
 
 **Usage:**
@@ -447,11 +436,19 @@ You can edit your configuration in several ways:
 
    ```bash
    # On macOS/Linux
-   nano ~/.mfer/config.yaml
+   nano ~/.mfer/config.toml
 
    # On Windows
-   notepad %USERPROFILE%\.mfer\config.yaml
+   notepad %USERPROFILE%\.mfer\config.toml
    ```
+
+3. **Migrate a legacy YAML config**:
+
+   ```bash
+   mfer config migrate
+   ```
+
+   Converts `~/.mfer/config.yaml` → `~/.mfer/config.toml`. Prompts before overwriting an existing TOML file and optionally removes the legacy YAML afterward.
 
 ## 🎯 Use Cases
 
@@ -470,25 +467,12 @@ mfer run admin     # Start admin panel
 
 Organize your micro frontends into logical groups:
 
-```yaml
-groups:
-  all:
-    - main-app
-    - admin-panel
-    - user-dashboard
-    - shared-components
-    - design-system
-  core:
-    - main-app
-    - shared-components
-    - design-system
-  admin:
-    - admin-panel
-    - user-dashboard
-    - shared-components
-  ui:
-    - shared-components
-    - design-system
+```toml
+[groups]
+all = ["main-app", "admin-panel", "user-dashboard", "shared-components", "design-system"]
+core = ["main-app", "shared-components", "design-system"]
+admin = ["admin-panel", "user-dashboard", "shared-components"]
+ui = ["shared-components", "design-system"]
 ```
 
 ### Team Collaboration
@@ -588,4 +572,5 @@ Built with:
 - [Inquirer](https://github.com/SBoudrias/Inquirer.js) - Interactive prompts
 - [Concurrently](https://github.com/open-cli-tools/concurrently) - Process management
 - [Chalk](https://github.com/chalk/chalk) - Terminal styling
-- [YAML](https://github.com/eemeli/yaml) - Configuration parsing
+- [smol-toml](https://github.com/squirrelchat/smol-toml) - Configuration parsing
+- [YAML](https://github.com/eemeli/yaml) - Legacy config parsing for `mfer config migrate`
