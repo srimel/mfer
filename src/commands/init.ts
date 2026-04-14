@@ -18,7 +18,7 @@ function createAndSaveConfig(
   libDirectory?: string,
   libs: string[] = [],
 ): void {
-  // If no repositories are provided, create placeholder entries to show proper YAML syntax
+  // If no repositories are provided, create placeholder entries to show proper TOML syntax
   const repositories =
     allGroup.length > 0 ? allGroup : ["my_mfe_1", "my_mfe_2"];
 
@@ -52,7 +52,7 @@ function createAndSaveConfig(
   if (allGroup.length === 0) {
     console.log(
       chalk.yellow(
-        "\nNote: Placeholder repository names have been added to show proper YAML syntax.",
+        "\nNote: Placeholder repository names have been added to show proper TOML syntax.",
       ),
     );
     console.log(
